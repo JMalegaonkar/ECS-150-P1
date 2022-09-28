@@ -9,7 +9,8 @@ int main(void)
 {
         char cmd[CMDLINE_MAX];
 
-        while (1) {
+        while (1) 
+        {
                 char *nl;
                 int retval;
 
@@ -21,26 +22,47 @@ int main(void)
                 fgets(cmd, CMDLINE_MAX, stdin);
 
                 /* Print command line if stdin is not provided by terminal */
-                if (!isatty(STDIN_FILENO)) {
+                if (!isatty(STDIN_FILENO)) 
+                {
                         printf("%s", cmd);
                         fflush(stdout);
                 }
 
                 /* Remove trailing newline from command line */
                 nl = strchr(cmd, '\n');
-                if (nl)
+                if (nl) 
+                {
                         *nl = '\0';
+                }
 
                 /* Builtin command */
-                if (!strcmp(cmd, "exit")) {
+                if (!strcmp(cmd, "exit")) 
+                {
                         fprintf(stderr, "Bye...\n");
                         break;
                 }
 
-                /* Regular command */
-                retval = system(cmd);
-                fprintf(stdout, "Return status value for '%s': %d\n",
-                        cmd, retval);
+                if (fork() == 0) 
+                {
+                        // child process
+                        retval = system(cmd);
+                        exit(retval);
+                }
+                else
+                {
+                        // parent process
+                        wait(&retval);
+                        if (WIFEXITED(retval))
+                        {
+                                fprintf(stdout, "Return status value for '%s': %d\n",
+                                cmd, retval);
+                        }
+                        else
+                        {
+                                printf("CHild did not terminate with exit\n");
+                        }
+
+                }
         }
 
         return EXIT_SUCCESS;
