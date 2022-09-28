@@ -54,12 +54,12 @@ int main(void)
                         wait(&retval);
                         if (WIFEXITED(retval))
                         {
-                                fprintf(stdout, "Return status value for '%s': %d\n",
+                                fprintf(stderr, "Return status value for '%s': %d\n",
                                 cmd, retval);
                         }
                         else
                         {
-                                printf("CHild did not terminate with exit\n");
+                                fprintf(stderr, "Child did not terminate with exit\n");
                         }
 
                 }
