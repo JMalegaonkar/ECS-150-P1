@@ -45,8 +45,10 @@ int main(void)
                 if (fork() == 0) 
                 {
                         // child process
-                        retval = system(cmd);
-                        exit(retval);
+                        char *argv[2] = { cmd, NULL };
+                        execvp(cmd, argv);
+                        perror("execvp");
+                        exit(1);
                 }
                 else
                 {
