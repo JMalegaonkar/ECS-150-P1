@@ -56,7 +56,7 @@ int main(void)
                         wait(&retval);
                         if (WIFEXITED(retval))
                         {
-                                fprintf(stderr, "Return status value for '%s': %d\n",
+                                fprintf(stderr, "+ completed '%s' [%d]\n",
                                 cmd, retval);
                         }
                         else
