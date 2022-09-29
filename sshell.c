@@ -8,7 +8,7 @@
 
 int main(void)
 {
-        char cmd[CMDLINE_MAX];
+        char command_input[CMDLINE_MAX];
 
         while (1) 
         {
@@ -20,18 +20,18 @@ int main(void)
                 fflush(stdout);
 
                 /* Get command line */
-                fgets(cmd, CMDLINE_MAX, stdin);
+                fgets(command_input, CMDLINE_MAX, stdin);
 
                 /* Print command line if stdin is not provided by terminal */
                 if (!isatty(STDIN_FILENO)) 
                 {
-                        printf("%s", cmd);
+                        printf("%s", command_input);
                         fflush(stdout);
                 }
 
                 /* Remove trailing newline from command line */
                 // make last char NULL
-                nl = strchr(cmd, '\n');
+                nl = strchr(command_input, '\n');
                 if (nl) 
                 {
                         *nl = '\0';
@@ -39,27 +39,22 @@ int main(void)
 
                 /* Builtin command */
                 //Exit case
-                if (!strcmp(cmd, "exit")) 
+                if (!strcmp(command_input, "exit")) 
                 {
                         fprintf(stderr, "Bye...\n");
                         break;
                 }
                 
-                Command x = { .cmd = NULL, .args = NULL };
-                populate_command(x, cmd);
-                printf("command is [%s]\n", x.cmd);
-                printf("arg_len is %d\n", x.args_len);
-                for (int i=0; i<x.args_len; i++) {
-                        printf("args[%d] = [%s]", i, x.args[i]);
-                }
-
+                // Parses command_input to Command object
+                Command command = { .cmd = NULL, .args = NULL };
+                populate_command(&command, command_input);
 
                 // Complete Child Process First
                 if (fork() == 0) 
                 {
                         // child process
-                        char *argv[2] = { cmd, NULL };
-                        execvp(cmd, argv);
+                        char *argv[2] = { command.cmd, NULL };
+                        execvp(command.cmd, argv);
                         perror("execvp");
                         exit(1);
                 }
@@ -70,7 +65,7 @@ int main(void)
                         if (WIFEXITED(retval))
                         {
                                 fprintf(stderr, "+ completed '%s' [%d]\n",
-                                cmd, retval);
+                                command.cmd, retval);
                         }
                         else
                         {
