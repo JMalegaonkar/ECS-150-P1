@@ -1,7 +1,7 @@
 all: sshell
 
 sshell: sshell.c
-	gcc -Wall -Wextra -Werror sshell.c -o sshell
+	gcc -Wall -Wextra -Werror command.c sshell.c -o sshell
 
 clean:
 	rm -f sshell
