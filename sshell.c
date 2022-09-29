@@ -47,6 +47,12 @@ int main(void)
                 
                 Command x = { .cmd = NULL, .args = NULL };
                 populate_command(x, cmd);
+                printf("command is [%s]\n", x.cmd);
+                printf("arg_len is %d\n", x.args_len);
+                for (int i=0; i<x.args_len; i++) {
+                        printf("args[%d] = [%s]", i, x.args[i]);
+                }
+
 
                 // Complete Child Process First
                 if (fork() == 0) 
