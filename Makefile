@@ -4,9 +4,7 @@ OBJFILES = command.o sshell.o
 TARGET = sshell
 
 
-
 all: $(TARGET)
-
 
 $(TARGET): $(OBJFILES)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES)
