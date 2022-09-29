@@ -53,7 +53,7 @@ int main(void)
                 if (fork() == 0) 
                 {
                         // child process
-                        char *argv[2] = { command.cmd, NULL };
+                        char *argv[3] = {command.cmd, *command.args, NULL };
                         execvp(command.cmd, argv);
                         perror("execvp");
                         exit(1);
@@ -65,7 +65,7 @@ int main(void)
                         if (WIFEXITED(retval))
                         {
                                 fprintf(stderr, "+ completed '%s' [%d]\n",
-                                command.cmd, retval);
+                                command_input, retval);
                         }
                         else
                         {

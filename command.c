@@ -25,7 +25,7 @@ void populate_command(Command* command_object, const char* command_string)
         command_object->args_len++;
         pch = strtok(NULL, " ");
     }
-    assert(command_object->args_len > 0);
+    // assert(command_object->args_len > 0);
 
     // Populate cmd
     pch = strtok(command_string2, " ");
