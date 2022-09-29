@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "command.h"
 
 #define CMDLINE_MAX 512
 
@@ -41,6 +42,9 @@ int main(void)
                         fprintf(stderr, "Bye...\n");
                         break;
                 }
+                
+                Command x = { .cmd = NULL, .args = NULL };
+                populate_command(x, cmd);
 
                 if (fork() == 0) 
                 {
