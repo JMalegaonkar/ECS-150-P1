@@ -15,7 +15,7 @@ int main(void)
                 int retval;
 
                 /* Print prompt */
-                printf("sshell$ ");
+                printf("sshell@ucd$ ");
                 fflush(stdout);
 
                 /* Get command line */
@@ -29,6 +29,7 @@ int main(void)
                 }
 
                 /* Remove trailing newline from command line */
+                // make last char NULL
                 nl = strchr(cmd, '\n');
                 if (nl) 
                 {
@@ -36,12 +37,14 @@ int main(void)
                 }
 
                 /* Builtin command */
+                //Exit case
                 if (!strcmp(cmd, "exit")) 
                 {
                         fprintf(stderr, "Bye...\n");
                         break;
                 }
 
+                // Complete Child Process First
                 if (fork() == 0) 
                 {
                         // child process
