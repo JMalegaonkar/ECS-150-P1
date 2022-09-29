@@ -29,23 +29,21 @@ int main(void)
                         fflush(stdout);
                 }
 
-                /* Remove trailing newline from command line */
-                // make last char NULL
+                /* Replace trailing newline from command line with null terminator */
                 nl = strchr(command_input, '\n');
                 if (nl) 
                 {
                         *nl = '\0';
                 }
 
-                /* Builtin command */
-                //Exit case
+                /* Exit Condition */
                 if (!strcmp(command_input, "exit")) 
                 {
                         fprintf(stderr, "Bye...\n");
                         break;
                 }
                 
-                // Parses command_input to Command object
+                // Parses command_input to create Command object
                 Command command = { .cmd = NULL, .args = NULL };
                 populate_command(&command, command_input);
 
