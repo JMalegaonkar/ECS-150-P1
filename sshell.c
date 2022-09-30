@@ -55,37 +55,37 @@ int main(void)
                 populate_command(&command, command_input);
 
 
-                if (!strcmp(command.cmd, "cd"))
-                {
+                // if (!strcmp(command.cmd, "cd"))
+                // {
 
-                        if (fork() == 0) 
-                        {
-                                //child process
-                                char *argv[3] = {command.cmd, *command.args, NULL };
-                                execvp(command.cmd, argv);
-                                perror("execvp");
-                                exit(1);
-                        } 
-                        else
-                        {
-                                // parent process
-                                wait(&retval);
-                                if (WIFEXITED(retval))
-                                {
-                                        chdir(command.args[0]);
-                                        fprintf(stderr, "+ completed '%s' [%d]\n",
-                                        command_input, retval);
-                                }
-                                else
-                                {
-                                        fprintf(stderr, "Child did not terminate with exit\n");
-                                }
+                //         if (fork() == 0) 
+                //         {
+                //                 //child process
+                //                 char *argv[3] = {command.cmd, *command.args, NULL };
+                //                 execvp(command.cmd, argv);
+                //                 perror("execvp");
+                //                 exit(1);
+                //         } 
+                //         else
+                //         {
+                //                 // parent process
+                //                 wait(&retval);
+                //                 if (WIFEXITED(retval))
+                //                 {
+                //                         chdir(command.args[0]);
+                //                         fprintf(stderr, "+ completed '%s' [%d]\n",
+                //                         command_input, retval);
+                //                 }
+                //                 else
+                //                 {
+                //                         fprintf(stderr, "Child did not terminate with exit\n");
+                //                 }
 
-                        }
+                //         }
 
-                }
-                else
-                {
+                // }
+                // else
+                // {
                         // Complete Child Process First
                         if (fork() == 0) 
                         {
@@ -100,6 +100,10 @@ int main(void)
                         {
                                 // parent process
                                 wait(&retval);
+                                if (!strcmp(command.cmd, "cd"))
+                                {
+                                        chdir(command.args[0]);
+                                }
                                 if (WIFEXITED(retval))
                                 {
                                         fprintf(stderr, "+ completed '%s' [%d]\n",
@@ -111,7 +115,7 @@ int main(void)
                                 }
 
                         }      
-                }
+                // }
 
         }
 
