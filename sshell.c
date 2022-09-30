@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 #include "command.h"
 
 #define CMDLINE_MAX 512
@@ -9,6 +10,7 @@
 int main(void)
 {
         char command_input[CMDLINE_MAX];
+        char cwd[PATH_MAX];
 
         while (1) 
         {
@@ -45,9 +47,9 @@ int main(void)
 
                 if (!strcmp(command_input, "pwd")) 
                 {
-                        char cwd[512];
-                        getcwd(cwd, sizeof(cwd));
-                        printf("'%s'\n", cwd );
+                        getcwd(cwd, sizeof(cwd) * sizeof(char));
+                        printf("%s\n", cwd);
+                        continue;
                 }
                 
                 // Parses command_input to create Command object
@@ -55,67 +57,35 @@ int main(void)
                 populate_command(&command, command_input);
 
 
-                // if (!strcmp(command.cmd, "cd"))
-                // {
+                // Complete Child Process First
+                if (fork() == 0) 
+                {
+                        // child process
+                        char *argv[3] = {command.cmd, *command.args, NULL };
 
-                //         if (fork() == 0) 
-                //         {
-                //                 //child process
-                //                 char *argv[3] = {command.cmd, *command.args, NULL };
-                //                 execvp(command.cmd, argv);
-                //                 perror("execvp");
-                //                 exit(1);
-                //         } 
-                //         else
-                //         {
-                //                 // parent process
-                //                 wait(&retval);
-                //                 if (WIFEXITED(retval))
-                //                 {
-                //                         chdir(command.args[0]);
-                //                         fprintf(stderr, "+ completed '%s' [%d]\n",
-                //                         command_input, retval);
-                //                 }
-                //                 else
-                //                 {
-                //                         fprintf(stderr, "Child did not terminate with exit\n");
-                //                 }
-
-                //         }
-
-                // }
-                // else
-                // {
-                        // Complete Child Process First
-                        if (fork() == 0) 
+                        execvp(command.cmd, argv);
+                        perror("execvp");
+                        exit(1);
+                }       
+                else
+                {
+                        // parent process
+                        wait(&retval);
+                        if (!strcmp(command.cmd, "cd") && command.args_len == 1)
                         {
-                                // child process
-                                char *argv[3] = {command.cmd, *command.args, NULL };
+                                chdir(command.args[0]);
+                        }
 
-                                execvp(command.cmd, argv);
-                                perror("execvp");
-                                exit(1);
-                        }       
+                        if (WIFEXITED(retval))
+                        {
+                                fprintf(stderr, "+ completed '%s' [%d]\n", command_input, retval);
+                        }
                         else
                         {
-                                // parent process
-                                wait(&retval);
-                                if (!strcmp(command.cmd, "cd"))
-                                {
-                                        chdir(command.args[0]);
-                                }
-                                if (WIFEXITED(retval))
-                                {
-                                        fprintf(stderr, "+ completed '%s' [%d]\n",
-                                        command_input, retval);
-                                }
-                                else
-                                {
-                                        fprintf(stderr, "Child did not terminate with exit\n");
-                                }
+                                fprintf(stderr, "Child did not terminate with exit\n");
+                        }
 
-                        }      
-                // }
+                }      
 
         }
 
