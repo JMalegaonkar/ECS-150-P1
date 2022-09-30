@@ -42,6 +42,13 @@ int main(void)
                         fprintf(stderr, "Bye...\n");
                         break;
                 }
+
+                if (!strcmp(command_input, "pwd")) 
+                {
+                        char cwd[256];
+                        getcwd(cwd, sizeof(cwd));
+                        printf("'%s'\n", cwd );
+                }
                 
                 // Parses command_input to create Command object
                 Command command = { .cmd = NULL, .args = NULL };
