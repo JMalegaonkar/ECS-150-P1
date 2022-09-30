@@ -45,7 +45,7 @@ int main(void)
 
                 if (!strcmp(command_input, "pwd")) 
                 {
-                        char cwd[256];
+                        char cwd[512];
                         getcwd(cwd, sizeof(cwd));
                         printf("'%s'\n", cwd );
                 }
@@ -57,40 +57,62 @@ int main(void)
 
                 if (!strcmp(command.cmd, "cd"))
                 {
-                        char cwd[256];
-                        getcwd(cwd, sizeof(cwd));
-                        printf("'%s'\n", cwd );
-                        chdir(command.args[0]); 
-                        getcwd(cwd, sizeof(cwd));
-                        printf("'%s'\n", cwd );
 
-                }
-
-                // Complete Child Process First
-                if (fork() == 0) 
-                {
-                        // child process
-                        char *argv[3] = {command.cmd, *command.args, NULL };
-
-                        execvp(command.cmd, argv);
-                        perror("execvp");
-                        exit(1);
-                }       
-                else
-                {
-                        // parent process
-                        wait(&retval);
-                        if (WIFEXITED(retval))
+                        if (fork() == 0) 
                         {
-                                fprintf(stderr, "+ completed '%s' [%d]\n",
-                                command_input, retval);
-                        }
+                                //child process
+                                char *argv[3] = {command.cmd, *command.args, NULL };
+                                execvp(command.cmd, argv);
+                                perror("execvp");
+                                exit(1);
+                        } 
                         else
                         {
-                                fprintf(stderr, "Child did not terminate with exit\n");
+                                // parent process
+                                wait(&retval);
+                                if (WIFEXITED(retval))
+                                {
+                                        chdir(command.args[0]);
+                                        fprintf(stderr, "+ completed '%s' [%d]\n",
+                                        command_input, retval);
+                                }
+                                else
+                                {
+                                        fprintf(stderr, "Child did not terminate with exit\n");
+                                }
+
                         }
 
                 }
+                else
+                {
+                        // Complete Child Process First
+                        if (fork() == 0) 
+                        {
+                                // child process
+                                char *argv[3] = {command.cmd, *command.args, NULL };
+
+                                execvp(command.cmd, argv);
+                                perror("execvp");
+                                exit(1);
+                        }       
+                        else
+                        {
+                                // parent process
+                                wait(&retval);
+                                if (WIFEXITED(retval))
+                                {
+                                        fprintf(stderr, "+ completed '%s' [%d]\n",
+                                        command_input, retval);
+                                }
+                                else
+                                {
+                                        fprintf(stderr, "Child did not terminate with exit\n");
+                                }
+
+                        }      
+                }
+
         }
 
         return EXIT_SUCCESS;
