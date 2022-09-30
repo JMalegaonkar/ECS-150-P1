@@ -47,15 +47,28 @@ int main(void)
                 Command command = { .cmd = NULL, .args = NULL };
                 populate_command(&command, command_input);
 
+
+                if (!strcmp(command.cmd, "cd"))
+                {
+                        char cwd[256];
+                        getcwd(cwd, sizeof(cwd));
+                        printf("'%s'\n", cwd );
+                        chdir(command.args[0]); 
+                        getcwd(cwd, sizeof(cwd));
+                        printf("'%s'\n", cwd );
+
+                }
+
                 // Complete Child Process First
                 if (fork() == 0) 
                 {
                         // child process
                         char *argv[3] = {command.cmd, *command.args, NULL };
+
                         execvp(command.cmd, argv);
                         perror("execvp");
                         exit(1);
-                }
+                }       
                 else
                 {
                         // parent process

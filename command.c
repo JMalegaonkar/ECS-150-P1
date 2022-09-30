@@ -3,7 +3,8 @@
 #include <string.h>
 #include <assert.h>
 
-typedef struct Command {
+typedef struct Command 
+{
     char* cmd;
     char** args;
     int args_len;
