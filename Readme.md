@@ -5,3 +5,7 @@ ToDo:
 - Modify exec to support commands
 - Make Makefile more legit (it's kinda using bad practices right now)
 - Begin phase 3
+
+
+Notes:
+- Make sure "exit > file1.txt" created file1.txt if it DNE and populates it with "Bye..."
