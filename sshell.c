@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <limits.h>
 #include "command.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define CMDLINE_MAX 512
 
