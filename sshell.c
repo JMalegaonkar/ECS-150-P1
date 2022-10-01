@@ -5,6 +5,8 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "command.h"
 #include "command_pipeline.h"
 
