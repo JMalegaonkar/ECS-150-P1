@@ -8,6 +8,6 @@ typedef struct Command
     int args_len;
 } Command;
 
-void populate_command(Command* command_object, const char* command_string);
+Command* create_command(const char* command_string);
 
 #endif

@@ -10,9 +10,11 @@ typedef struct Command
     int args_len;
 } Command;
 
-void populate_command(Command* command_object, const char* command_string)
+Command* create_command(const char* command_string)
 {
     const char* SEPARATOR = " ";
+
+    Command* command_object = (Command*) malloc(sizeof(Command));
 
     char* command_string1 = (char*) malloc((strlen(command_string) + 1) * sizeof(char)); // used to get length
     char* command_string2 = (char*) malloc((strlen(command_string) + 1) * sizeof(char)); // used to get cmd & args
@@ -47,4 +49,6 @@ void populate_command(Command* command_object, const char* command_string)
 
     free(command_string1);
     free(command_string2);
+
+    return command_object;
 }

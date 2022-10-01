@@ -53,8 +53,7 @@ int main(void)
                 }
                 
                 // Parses command_input to create Command object
-                Command command = { .cmd = NULL, .args = NULL };
-                populate_command(&command, command_input);
+                Command command = *create_command(command_input);
 
 
                 // Complete Child Process First
