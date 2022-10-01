@@ -60,7 +60,13 @@ int main(void)
                 if (fork() == 0) 
                 {
                         // child process
-                        char *argv[3] = {command.cmd, *command.args, NULL };
+                        char *argv[command.args_len + 2];
+                        argv[0] = command.cmd;
+                        for (int i=0; i<command.args_len; i++) 
+                        {
+                                argv[i+1] = command.args[i];
+                        }
+                        argv[command.args_len + 1] = NULL;
 
                         execvp(command.cmd, argv);
                         perror("execvp");
