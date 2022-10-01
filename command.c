@@ -2,13 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-typedef struct Command 
-{
-    char* cmd;
-    char** args;
-    int args_len;
-} Command;
+#include "command.h"
 
 Command* create_command(const char* command_string)
 {
