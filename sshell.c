@@ -3,9 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "command.h"
-#include <sys/types.h>
-#include <sys/wait.h>
+#include "command_pipeline.h"
 
 #define CMDLINE_MAX 512
 
@@ -20,7 +21,7 @@ int main(void)
                 int retval;
 
                 /* Print prompt */
-                printf("sshell@ucd$ ");
+                fprintf(stderr, "sshell@ucd$ ");
                 fflush(stdout);
 
                 /* Get command line */
@@ -43,7 +44,7 @@ int main(void)
                 /* Exit Condition */
                 if (!strcmp(command_input, "exit")) 
                 {
-                        fprintf(stderr, "Bye...\n+ completed '%s' [%d]\n", command_input, retval);
+                        fprintf(stderr, "Bye...\n");
                         break;
                 }
 
@@ -56,7 +57,13 @@ int main(void)
                 
                 // Parses command_input to create Command object
                 Command command = *create_command(command_input);
-
+                
+                // char* out_file = "file1.txt"; // replace file1.txt with command_pipeline
+                // if (out_file != NULL)
+                // {
+                //         int fd = open(out_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
+                //         dup2(fd, STDOUT_FILENO);
+                // }
 
                 // Complete Child Process First
                 if (fork() == 0) 
