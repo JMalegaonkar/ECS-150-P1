@@ -6,6 +6,12 @@
 #include "command_pipeline.h"
 #include "command.h"
 
+typedef struct Command 
+{
+    char* cmd;
+    char** args;
+    int args_len;
+} Command;
 
 void strip_whitespace(char *string)
 {
@@ -28,7 +34,7 @@ void strip_whitespace(char *string)
 
 
 
-CommandPipeline* create_command_pipeline(const char* command_string)
+CommandPipeline* create_command_pipeline(char* command_string)
 {
     const char* FILE_SEPARATOR = ">";
     const char* PIPE_SEPARATOR = "|";
