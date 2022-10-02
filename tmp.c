@@ -6,12 +6,6 @@
 #include "command_pipeline.h"
 #include "command.h"
 
-typedef struct Command 
-{
-    char* cmd;
-    char** args;
-    int args_len;
-} Command;
 
 void strip_whitespace(char *string)
 {
@@ -73,7 +67,6 @@ CommandPipeline* create_command_pipeline(char* command_string)
     char* pipe_string2 = (char*) malloc((strlen(separate[0]) + 1) * sizeof(char));
     strcpy(pipe_string, separate[0]);
     strcpy(pipe_string2, separate[0]);
-    printf("%s \n", pipe_string2);
 
     printf("Finished copying and allocating memory for pipe string\n");
 
@@ -86,7 +79,8 @@ CommandPipeline* create_command_pipeline(char* command_string)
         command_pipeline_object->commands_length++;
         token1 = strtok(NULL, PIPE_SEPARATOR);
     }
-
+    printf(" ^^^^ %s \n", pipe_string);
+    printf(" @@@@ %s \n", pipe_string2);
     printf("Finished finding command_pipeline_object->commands_length: '%d' \n", command_pipeline_object->commands_length);
     
 
@@ -94,23 +88,27 @@ CommandPipeline* create_command_pipeline(char* command_string)
 
     printf("Finished allocating memory for command_pipeline_object->commands object\n");
 
-
+    printf("%s\n", pipe_string2);
     char *token2 = strtok(pipe_string2, PIPE_SEPARATOR);
+    char * tmp_string; 
     for (unsigned i=0; token2 != NULL; i++)
     {
-        char * tmp_string = token2;
+        // printf("%s\n", pipe_string2);
+        tmp_string = token2;
         strip_whitespace(tmp_string);
-        Command* current_command = create_command(tmp_string);
-        command_pipeline_object->commands[i] = (Command*) malloc(sizeof(current_command));
-        memcpy(&command_pipeline_object->commands[i], &current_command, sizeof(current_command));
-        printf("%s \n", command_pipeline_object->commands[i]->cmd);
-        printf("%d \n", command_pipeline_object->commands[i]->args_len);
-        for (int j = 0; j < command_pipeline_object->commands[i]->args_len ; j++)
-        {
-            printf("%s \n",command_pipeline_object->commands[i]->args[i]);
-        }
+        printf("%s\n", tmp_string);
+        // Command current_command = *create_command(tmp_string);
+        // printf("%s \n", current_command.cmd);
+        // printf("%d \n", current_command.args_len);
+        // command_pipeline_object->commands[i] = (Command*) malloc(sizeof(current_command) + 1);
+        // memcpy(&command_pipeline_object->commands[i], &current_command, sizeof(current_command) + 1);
+        // printf("%s \n", command_pipeline_object->commands[i]->cmd);
+        // printf("%d \n", command_pipeline_object->commands[i]->args_len);
+        // for (int j = 0; j < command_pipeline->object->commands[i]->args_len ; j++)
+        // {
+        //     printf("%s \n",command_pipeline_object->commands[i]->args[i]);
+        // }
         token2 = strtok(NULL, PIPE_SEPARATOR);
-        printf("%s \n", token2);
     }
 
     free(full_string);
@@ -121,6 +119,6 @@ CommandPipeline* create_command_pipeline(char* command_string)
 
 int main()
 {
-    const char* command_string = "cd ..    |ls -a -l | ls>output_file    ";
+    char* command_string = "cd ..    |ls -a -l | ls>output_file    ";
     CommandPipeline x  = *create_command_pipeline(command_string);
 }

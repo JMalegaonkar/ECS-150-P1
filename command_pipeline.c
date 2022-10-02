@@ -14,37 +14,10 @@ typedef struct CommandPipeline
 } CommandPipeline;
 
 
-CommandPipeline* create_command_pipeline(char* command_string)
+CommandPipeline* create_command_pipeline(const char* command_string)
 {
-    const char* FILE_SEPARATOR = ">";
-    const char* PIPE_SEPARATOR = "|";
-
-
-    CommandPipeline* command_pipeline_object = (CommandPipeline*) malloc(sizeof(CommandPipeline));
-
-    char* command_len_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char)); // used to get length
-    strcpy(command_len_string, command_string);
-
-
-    
-    char *token = strtok(command_len_string, FILE_SEPARATOR);   
-    char *separate = (char**) malloc(2 * sizeof(char*));
-    for (unsigned i=0; token != NULL; i++)
-    {
-        separate[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
-        strcpy(command_object->args[i], token);
-        token = strtok(NULL, SEPARATOR);
-    }
-
-    for(int i = 0; i < 2; i ++)
-    {
-        printf("%s", separate[i])
-    }
-
-
-
     return NULL;
-
+}
 
 
 //     // Populate args_len

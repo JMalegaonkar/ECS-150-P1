@@ -4,7 +4,7 @@
 #include <assert.h>
 #include "command.h"
 
-Command* create_command(char* command_string)
+Command* create_command(const char* command_string)
 {
     const char* SEPARATOR = " ";
 
