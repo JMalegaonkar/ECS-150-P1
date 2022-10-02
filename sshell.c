@@ -43,7 +43,7 @@ int main(void)
                 /* Exit Condition */
                 if (!strcmp(command_input, "exit")) 
                 {
-                        fprintf(stderr, "Bye...\n+ completed '%s' [%d]\n", command_input, retval);
+                        fprintf(stderr, "Bye...\n+ completed '%s' [0]\n", command_input);
                         break;
                 }
 

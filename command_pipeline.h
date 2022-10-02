@@ -10,7 +10,7 @@ typedef struct CommandPipeline
     int commands_length;
 } CommandPipeline;
 
-
+CommandPipeline* create_command_pipeline(char* command_string);
 
 
 

@@ -8,6 +8,6 @@ typedef struct Command
     int args_len;
 } Command;
 
-Command* create_command(const char* command_string);
+Command* create_command(char* command_string);
 
 #endif
