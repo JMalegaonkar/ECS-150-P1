@@ -9,5 +9,8 @@ all: $(TARGET)
 $(TARGET): $(OBJFILES)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES)
 
+tmp:
+	$(CC) $(CFLAGS) -o tmp tmp.c
+
 clean:
 	rm -f $(OBJFILES) $(TARGET) *~
