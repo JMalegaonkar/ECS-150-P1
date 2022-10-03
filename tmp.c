@@ -183,6 +183,11 @@ int main()
     {
         printf("%s\n", x.commands[k]->cmd);
         printf("%d\n", x.commands[k]->args_len);
+        for (int l = 0; l < x.commands[k]->args_len; l ++ )
+        {
+            printf("%s\n", x.commands[k]->args[l]);
+        }
+
     }
 
 
