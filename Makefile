@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
-OBJFILES = command.o sshell.o
+OBJFILES = command_pipeline.o command.o sshell.o
 TARGET = sshell
 
 
