@@ -40,6 +40,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     char *token = strtok(full_string, FILE_SEPARATOR);   
     char **separate = (char**) malloc(2 * sizeof(char*));
+    int seperated_chunks = 0;
     for (unsigned i=0; token != NULL; i++)
     {
         char * tmp_string = token; 
@@ -47,13 +48,17 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         separate[i] = (char*) malloc((strlen(tmp_string) + 1) * sizeof(char));
         strcpy(separate[i],tmp_string);
         token = strtok(NULL, FILE_SEPARATOR);
+        seperated_chunks += 1;
     }
 
     printf("Finished separating output file from commands\n");
     
-
-    command_pipeline_object->output_file = (char*) malloc((strlen(separate[1]) + 1) * sizeof(char));
-    strcpy(command_pipeline_object->output_file, separate[1]);
+    if (seperated_chunks == 2) {
+        command_pipeline_object->output_file = (char*) malloc((strlen(separate[1]) + 1) * sizeof(char));
+        strcpy(command_pipeline_object->output_file, separate[1]);
+    } else {
+        command_pipeline_object->output_file = NULL;
+    }
 
     printf("Printing command_pipeline_object->output_file: '%s' \n", command_pipeline_object->output_file);
 
