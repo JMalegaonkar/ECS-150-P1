@@ -2,7 +2,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 #include "command_pipeline.h"
+
+void strip_whitespace(char *string)
+{
+    int begin = 0;
+    int end = strlen(string) - 1;
+
+    while (isspace((unsigned char) string[begin]))
+        begin++;
+
+    while ((end >= begin) && isspace((unsigned char) string[end]))
+        end--;
+
+    // Shift all characters back to the start of the string array.
+    int i;
+    for (i = begin; i <= end; i++)
+        string[i - begin] = string[i];
+
+}
 
 CommandPipeline* create_command_pipeline(const char* command_string)
 {
