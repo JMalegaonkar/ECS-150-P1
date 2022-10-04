@@ -71,7 +71,6 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     strcpy(pipe_string2, separate[0]);
 
 
-
     // Populate commands_length
     command_pipeline_object->commands_length = 0;
     char *token1 = strtok(pipe_string1, PIPE_SEPARATOR);
@@ -81,7 +80,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         token1 = strtok(NULL, PIPE_SEPARATOR);
     }
 
-    
+    // create list of commands in the pipeline
     char *token2 = strtok(pipe_string2, PIPE_SEPARATOR);
     char **pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
     for (unsigned i = 0; token2 != NULL; i++)
@@ -94,23 +93,21 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         token2 = strtok(NULL, PIPE_SEPARATOR);
     }
 
-    printf("Finished creating list of commands \n");
-
-
+    
+    // Create commands objects for each command in pipline and populate commands
     command_pipeline_object->commands = (Command**) malloc(command_pipeline_object->commands_length * sizeof(Command*));
-    printf("Finished allocating memory for command_pipeline_object->commands object\n");
     for (int k = 0; k < command_pipeline_object->commands_length; k ++ )
     {
         Command current_command = *create_command(pipe_commands[k]);
-        printf("%s \n", current_command.cmd);
-        printf("%d \n", current_command.args_len);
         command_pipeline_object->commands[k] = (Command*) malloc(sizeof(current_command) + 1);
         memcpy(command_pipeline_object->commands[k], &current_command, sizeof(current_command) + 1);
     }
-    printf("Finished creating Command objects and copying them into pipleine object\n");
 
+    // free all allocated memory
     free(full_string);
     free(separate);
+    free(pipe_string1);
+    free(pipe_string2);
     free(pipe_commands);
 
     return command_pipeline_object;
