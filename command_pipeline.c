@@ -25,65 +25,63 @@ void strip_whitespace(char *string)
 
 CommandPipeline* create_command_pipeline(const char* command_string)
 {
+    // tokens for parsing
     const char* FILE_SEPARATOR = ">";
     const char* PIPE_SEPARATOR = "|";
 
-    printf("Finished creating separators\n");
+
+    // create new Command Pipeline object
     CommandPipeline* command_pipeline_object = (CommandPipeline*) malloc(sizeof(CommandPipeline));
-    printf("Finished creating CommandPipeline object \n");
 
     char* full_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
     strcpy(full_string, command_string);
-
-    printf("Finished copying and allocating memory for input string\n");
 
 
     char *token = strtok(full_string, FILE_SEPARATOR);   
     char **separate = (char**) malloc(2 * sizeof(char*));
     int seperated_chunks = 0;
+
+    // Find and separate redirection to output file if redirection exists
     for (unsigned i=0; token != NULL; i++)
     {
-        char * tmp_string = token; 
-        strip_whitespace(tmp_string);
-        separate[i] = (char*) malloc((strlen(tmp_string) + 1) * sizeof(char));
-        strcpy(separate[i],tmp_string);
+        char * clean_string = token; 
+        strip_whitespace(clean_string);
+        separate[i] = (char*) malloc((strlen(clean_string) + 1) * sizeof(char));
+        strcpy(separate[i],clean_string);
         token = strtok(NULL, FILE_SEPARATOR);
         seperated_chunks += 1;
     }
 
-    printf("Finished separating output file from commands\n");
-    
-    if (seperated_chunks == 2) {
+    // if redirection exists allocate memory for outputfile in Command Pipeline object else NULL
+    if (seperated_chunks == 2) 
+    {
         command_pipeline_object->output_file = (char*) malloc((strlen(separate[1]) + 1) * sizeof(char));
         strcpy(command_pipeline_object->output_file, separate[1]);
-    } else {
+    } 
+    else 
+    {
         command_pipeline_object->output_file = NULL;
     }
 
-    printf("Printing command_pipeline_object->output_file: '%s' \n", command_pipeline_object->output_file);
 
-
-    char* pipe_string = (char*) malloc((strlen(separate[0]) + 1) * sizeof(char));
+    // copy and allocate memory for pipe string
+    char* pipe_string1 = (char*) malloc((strlen(separate[0]) + 1) * sizeof(char));
     char* pipe_string2 = (char*) malloc((strlen(separate[0]) + 1) * sizeof(char));
     strcpy(pipe_string, separate[0]);
     strcpy(pipe_string2, separate[0]);
 
-    printf("Finished copying and allocating memory for pipe string\n");
 
 
     // Populate commands_length
     command_pipeline_object->commands_length = 0;
-    char *token1 = strtok(pipe_string, PIPE_SEPARATOR);
+    char *token1 = strtok(pipe_string1, PIPE_SEPARATOR);
     while (token1 != NULL) 
     {
         command_pipeline_object->commands_length++;
         token1 = strtok(NULL, PIPE_SEPARATOR);
     }
 
-    printf("Finished finding command_pipeline_object->commands_length: '%d' \n", command_pipeline_object->commands_length);
     
-
-    printf("%s\n", pipe_string2);
     char *token2 = strtok(pipe_string2, PIPE_SEPARATOR);
     char **pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
     for (unsigned i = 0; token2 != NULL; i++)
@@ -112,6 +110,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     printf("Finished creating Command objects and copying them into pipleine object\n");
 
     free(full_string);
+    free(separate);
     free(pipe_commands);
 
     return command_pipeline_object;
