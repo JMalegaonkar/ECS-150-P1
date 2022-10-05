@@ -5,26 +5,20 @@
 #include <ctype.h>
 #include "command_pipeline.h"
 
-void strip_whitespace(char *string)
+char* strip_whitespace(char *string)
 {
-    int begin = 0;
-    int end = strlen(string) - 1;
+    char *end;
 
-    while (isspace((unsigned char) string[begin]))
-    {
-        begin++;
-    }
+    // strip leading space 
+    while(isspace((unsigned char)*string)) string++;
 
-    while ((end >= begin) && isspace((unsigned char) string[end]))
-    {
-        end--;
-    }
+    if(*string == 0) return string;
 
-    // Shift all characters back to the start of the string array.
-    for (int i = begin; i <= end; i++)
-    {
-        string[i - begin] = string[i];
-    }
+    end = string + strlen(string) - 1;
+    while( end > string && isspace((unsigned char)*end)) end--;
+    end[1] = '\0';
+
+    return string;
 }
 
 CommandPipeline* create_command_pipeline(const char* command_string)
@@ -49,7 +43,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     {
         seperated_command_string[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
         strcpy(seperated_command_string[i], token);
-        strip_whitespace(seperated_command_string[i]);
+        seperated_command_string[i] = strip_whitespace(seperated_command_string[i]);
         token = strtok(NULL, FILE_SEPARATOR);
         seperated_chunks++;
     }
@@ -84,7 +78,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     {
         pipe_commands[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
         strcpy(pipe_commands[i], token);
-        strip_whitespace(pipe_commands[i]);
+        pipe_commands[i] = strip_whitespace(pipe_commands[i]);
         token = strtok(NULL, PIPE_SEPARATOR);
     }
 
