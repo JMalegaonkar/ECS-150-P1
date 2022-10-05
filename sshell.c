@@ -12,6 +12,46 @@
 
 #define CMDLINE_MAX 512
 
+void execute_command(Command *command)
+{
+        char *argv[command->args_len + 2];
+
+        argv[0] = command->cmd;
+        for (int i=0; i<command->args_len; i++) 
+        {
+                argv[i+1] = command->args[i];
+        }
+        argv[command->args_len + 1] = NULL;
+
+        execvp(command->cmd, argv);
+        perror("execvp");
+        exit(1);
+}
+
+void execute_pipeline_command(CommandPipeline* command_pipeline, int command_idx)
+{
+        int fd[2];
+        pipe(fd);
+        if (fork() != 0)
+        {
+                close(fd[0]);
+                dup2(fd[1], STDOUT_FILENO);
+                close(fd[1]);
+
+                (command_idx - 1 == 0)
+                        ? execute_command(command_pipeline->commands[command_idx-1])
+                        : execute_pipeline_command(command_pipeline, command_idx-1);
+        }
+        else
+        {
+                close(fd[1]);
+                dup2(fd[0], STDIN_FILENO);
+                close(fd[0]);
+
+                execute_command(command_pipeline->commands[command_idx]);
+        }
+}
+
 int main(void)
 {
         char command_input[CMDLINE_MAX];
@@ -22,34 +62,35 @@ int main(void)
                 char *nl;
                 int retval;
 
-                /* Print prompt */
+                // Print prompt
                 fprintf(stderr, "sshell@ucd$ ");
                 fflush(stdout);
 
-                /* Get command line */
+                // Get command line
                 fgets(command_input, CMDLINE_MAX, stdin);
 
-                /* Print command line if stdin is not provided by terminal */
+                // Print command line if stdin is not provided by terminal
                 if (!isatty(STDIN_FILENO)) 
                 {
                         printf("%s", command_input);
                         fflush(stdout);
                 }
 
-                /* Replace trailing newline from command line with null terminator */
+                // Replace trailing newline from command line with null terminator
                 nl = strchr(command_input, '\n');
                 if (nl) 
                 {
                         *nl = '\0';
                 }
 
-                /* Exit Condition */
+                // Handle "exit" command
                 if (!strcmp(command_input, "exit")) 
                 {
                         fprintf(stderr, "Bye...\n+ completed '%s' [0]\n", command_input);
                         break;
                 }
 
+                // Handle "pwd" command
                 if (!strcmp(command_input, "pwd")) 
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
@@ -58,56 +99,44 @@ int main(void)
                 }
                 
                 // Parses command_input to create Command object
-                CommandPipeline command_pipeline = *create_command_pipeline(command_input);
+                CommandPipeline* command_pipeline = create_command_pipeline(command_input);
 
-                // hardcoding to only handle 1st command for now
-                // currently ignoring other commands in pipeline for now
-                Command command = *command_pipeline.commands[0];
-
-                // Complete Child Process First
-                if (fork() == 0) 
+                // Executes fork + exec + wait loop to execute command
+                if (fork() == 0) // child process
                 {
-                        // child process
-
                         // Handle output redirection
-                        if (command_pipeline.output_file != NULL)
+                        if (command_pipeline->output_file != NULL)
                         {
-                                int fd = open(command_pipeline.output_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
+                                int fd = open(command_pipeline->output_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
                                 dup2(fd, STDOUT_FILENO);
                         }
 
-                        // Populate argv for exec
-                        char *argv[command.args_len + 2];
-                        argv[0] = command.cmd;
-                        for (int i=0; i<command.args_len; i++) 
-                        {
-                                argv[i+1] = command.args[i];
-                        }
-                        argv[command.args_len + 1] = NULL;
-
-                        execvp(command.cmd, argv);
-                        perror("execvp");
-                        exit(1);
+                        // Execute command
+                        (command_pipeline->commands_length == 1)
+                                ? execute_command(command_pipeline->commands[0])
+                                : execute_pipeline_command(command_pipeline, command_pipeline->commands_length-1);
                 }       
-                else
+                else // parent process
                 {
-                        // parent process
+                        // Wait for child process to complete
                         wait(&retval);
-                        if (!strcmp(command.cmd, "cd") && command.args_len == 1)
+
+                        // Handle "cd" command
+                        int is_command_cd = 
+                                command_pipeline->commands_length == 1 && 
+                                !strcmp(command_pipeline->commands[0]->cmd, "cd") && 
+                                command_pipeline->commands[0]->args_len == 1;
+                        if (is_command_cd)
                         {
-                                chdir(command.args[0]);
+                                chdir(command_pipeline->commands[0]->args[0]);
                         }
 
-                        if (WIFEXITED(retval))
-                        {
-                                fprintf(stderr, "+ completed '%s' [%d]\n", command_input, retval);
-                        }
-                        else
-                        {
-                                fprintf(stderr, "Child did not terminate with exit\n");
-                        }
+                        // Execute command
+                        WIFEXITED(retval)
+                                ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, retval)
+                                : fprintf(stderr, "Child did not terminate with exit\n");
 
-                }      
+                }
 
         }
 
