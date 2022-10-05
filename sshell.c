@@ -60,13 +60,6 @@ int main(void)
                 // Parses command_input to create Command object
                 CommandPipeline command_pipeline = *create_command_pipeline(command_input);
 
-                // Handles output redirection
-                if (command_pipeline.output_file != NULL)
-                {
-                        int fd = open(command_pipeline.output_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
-                        dup2(fd, STDOUT_FILENO);
-                }
-
                 // hardcoding to only handle 1st command for now
                 // currently ignoring other commands in pipeline for now
                 Command command = *command_pipeline.commands[0];
@@ -75,6 +68,15 @@ int main(void)
                 if (fork() == 0) 
                 {
                         // child process
+
+                        // Handle output redirection
+                        if (command_pipeline.output_file != NULL)
+                        {
+                                int fd = open(command_pipeline.output_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
+                                dup2(fd, STDOUT_FILENO);
+                        }
+
+                        // Populate argv for exec
                         char *argv[command.args_len + 2];
                         argv[0] = command.cmd;
                         for (int i=0; i<command.args_len; i++) 
