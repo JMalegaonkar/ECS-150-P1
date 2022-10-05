@@ -47,10 +47,9 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     // Find and separate redirection to output file if redirection exists
     for (unsigned i=0; token != NULL; i++)
     {
-        char* clean_string = token; 
-        strip_whitespace(clean_string);
-        seperated_command_string[i] = (char*) malloc((strlen(clean_string) + 1) * sizeof(char));
-        strcpy(seperated_command_string[i],clean_string);
+        seperated_command_string[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
+        strcpy(seperated_command_string[i], token);
+        strip_whitespace(seperated_command_string[i]);
         token = strtok(NULL, FILE_SEPARATOR);
         seperated_chunks++;
     }
@@ -79,13 +78,13 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     }
 
     // create list of commands in the pipeline
-    char* pipe_command = strtok(pipe_string2, PIPE_SEPARATOR);
+    token = strtok(pipe_string2, PIPE_SEPARATOR);
     char** pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
     for (unsigned i = 0; token != NULL; i++)
     {
-        strip_whitespace(pipe_command);
-        pipe_commands[i] = (char*) malloc((strlen(pipe_command) + 1) * sizeof(char));
-        strcpy(pipe_commands[i], pipe_command);
+        pipe_commands[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
+        strcpy(pipe_commands[i], token);
+        strip_whitespace(pipe_commands[i]);
         token = strtok(NULL, PIPE_SEPARATOR);
     }
 
