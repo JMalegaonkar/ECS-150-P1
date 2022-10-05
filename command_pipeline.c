@@ -25,7 +25,6 @@ void strip_whitespace(char *string)
     {
         string[i - begin] = string[i];
     }
-    string[end+1] = '\0';
 }
 
 CommandPipeline* create_command_pipeline(const char* command_string)
