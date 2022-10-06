@@ -4,6 +4,7 @@
 typedef struct Command 
 {
     char* cmd;
+    char* input_file;
     char** args;
     int args_len;
 } Command;
