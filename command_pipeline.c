@@ -4,32 +4,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include "command_pipeline.h"
-
-char* strip_whitespace(char *string)
-{
-    char *end;
-
-    // strip leading white space 
-    while(isspace((unsigned char)*string))
-    {
-        string++;
-    }
-
-    if(*string == 0)
-    {
-        return string;
-    }
-
-    // strip trailing white space
-    end = string + strlen(string) - 1;
-    while(end > string && isspace((unsigned char)*end)) 
-    {
-        end--;
-    }
-    end[1] = '\0';
-
-    return string;
-}
+#include "string_utilities.h"
 
 CommandPipeline* create_command_pipeline(const char* command_string)
 {
@@ -91,7 +66,6 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         pipe_commands[i] = strip_whitespace(pipe_commands[i]);
         token = strtok(NULL, PIPE_SEPARATOR);
     }
-
     
     // Create commands objects for each command in pipline and populate commands
     command_pipeline_object->commands = (Command**) malloc(command_pipeline_object->commands_length * sizeof(Command*));
