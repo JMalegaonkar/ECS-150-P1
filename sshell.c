@@ -113,7 +113,7 @@ int main(void)
 
                         if (command_pipeline->input_file != NULL)
                         {
-                                int fd = open(command_pipeline->input_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
+                                int fd = open(command_pipeline->input_file, O_TRUNC | O_WRONLY, 0644);
                                 dup2(STDIN_FILENO, fd);
                         }
 
