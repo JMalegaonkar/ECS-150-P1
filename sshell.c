@@ -111,12 +111,6 @@ int main(void)
                                 dup2(fd, STDOUT_FILENO);
                         }
 
-                        if (command_pipeline->input_file != NULL)
-                        {
-                                int fd = open(command_pipeline->input_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
-                                dup2(STDIN_FILENO, fd);
-                        }
-
                         // Execute command
                         (command_pipeline->commands_length == 1)
                                 ? execute_command(command_pipeline->commands[0])

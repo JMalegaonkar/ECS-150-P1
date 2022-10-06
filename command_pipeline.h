@@ -7,7 +7,6 @@ typedef struct CommandPipeline
 {
     Command** commands;
     char* output_file;
-    char* input_file;
     int commands_length;
 } CommandPipeline;
 
