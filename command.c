@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include "command.h"
+#include "string_utilities.h"
 
 Command* create_command(const char* command_string)
 {
@@ -20,6 +21,7 @@ Command* create_command(const char* command_string)
     // Extract main command from full command
     char* main_command_string = (char*) malloc((strlen(token) + 1) * sizeof(char));
     strcpy(main_command_string, token);
+    main_command_string = strip_whitespace(main_command_string);
     token = strtok(NULL, INPUT_FILE_SEPERATOR);
 
     // Extract input file from full command (if it exists)
@@ -28,6 +30,7 @@ Command* create_command(const char* command_string)
     {
         command_object->input_file = (char*) malloc((strlen(token) + 1) * sizeof(char));
         strcpy(command_object->input_file, token);
+        command_object->input_file = strip_whitespace(command_object->input_file);
     }
 
     char* command_string1 = (char*) malloc((strlen(main_command_string) + 1) * sizeof(char)); // used to get length
