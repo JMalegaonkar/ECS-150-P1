@@ -12,12 +12,14 @@
 
 #define CMDLINE_MAX 512
 
-void execute_command(Command *command)
+void execute_command(Command *command, int command_idx)
 {
-        if (command->input_file != NULL)
+        if (command_idx == 0 && command->input_file != NULL)
         {
+                printf("lol\n");
                 int fd = open(command->input_file, O_TRUNC | O_WRONLY | O_CREAT, 0644);
                 dup2(STDIN_FILENO, fd);
+                close(STDIN_FILENO);
         }
 
         char *argv[command->args_len + 2];
@@ -45,7 +47,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, int command_idx
                 close(fd[1]);
 
                 (command_idx - 1 == 0)
-                        ? execute_command(command_pipeline->commands[command_idx-1])
+                        ? execute_command(command_pipeline->commands[command_idx-1], command_idx)
                         : execute_pipeline_command(command_pipeline, command_idx-1);
         }
         else
@@ -54,7 +56,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, int command_idx
                 dup2(fd[0], STDIN_FILENO);
                 close(fd[0]);
 
-                execute_command(command_pipeline->commands[command_idx]);
+                execute_command(command_pipeline->commands[command_idx], command_idx);
         }
 }
 
@@ -119,7 +121,7 @@ int main(void)
 
                         // Execute command
                         (command_pipeline->commands_length == 1)
-                                ? execute_command(command_pipeline->commands[0])
+                                ? execute_command(command_pipeline->commands[0], 0)
                                 : execute_pipeline_command(command_pipeline, command_pipeline->commands_length-1);
                 }       
                 else // parent process
