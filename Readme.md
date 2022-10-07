@@ -1,7 +1,6 @@
 # ECS 150 - Project 1
 
 ToDo:
-- fix input redirection (buggy because of pipelining)
 - phase 6
 
 Notes:
