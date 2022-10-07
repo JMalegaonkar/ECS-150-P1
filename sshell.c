@@ -14,6 +14,12 @@
 
 void execute_command(Command *command)
 {
+        if (command->input_file != NULL)
+        {
+                int fd = open(command->input_file, O_TRUNC | O_WRONLY | O_CREAT, 0644);
+                dup2(STDIN_FILENO, fd);
+        }
+
         char *argv[command->args_len + 2];
 
         argv[0] = command->cmd;
