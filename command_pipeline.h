@@ -12,6 +12,4 @@ typedef struct CommandPipeline
 
 CommandPipeline* create_command_pipeline(const char* command_string);
 
-
-
 #endif
