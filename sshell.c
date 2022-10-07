@@ -14,10 +14,21 @@
 
 void execute_command(Command *command, int command_idx)
 {
-        if (command_idx == 0 && command->input_file != NULL)
+        if (command_idx == 0 && command->expects_input_file)
         {
-                printf("lol\n");
-                int fd = open(command->input_file, O_TRUNC | O_WRONLY | O_CREAT, 0644);
+                if (command->input_file == NULL)
+                {
+                        fprintf(stderr, "Error: no input file\n");
+                        return;
+                }
+
+                int fd = open(command->input_file, O_WRONLY, 0644);
+                if (fd < 0)
+                {
+                        fprintf(stderr, "Error: cannot open input file\n");
+                        return;
+                }
+
                 dup2(STDIN_FILENO, fd);
                 close(STDIN_FILENO);
         }

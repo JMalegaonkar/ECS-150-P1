@@ -11,6 +11,7 @@ Command* create_command(const char* command_string)
     const char* WHITESPACE_SEPARATOR = " ";
 
     Command* command_object = (Command*) malloc(sizeof(Command));
+    command_object->expects_input_file = strchr(command_string, '<') != NULL;
 
     char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char)); // used to seperate main command and input file
     strcpy(full_command_string, command_string);
