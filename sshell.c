@@ -140,7 +140,10 @@ int main(void)
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
                         push(command_stack, cwd);
-                        chdir(command_pipeline->commands[0]->args[0]);
+                        if (chdir(command_pipeline->commands[0]->args[0]) == -1)
+                        {
+                                fprintf(stderr, "Error: no such directory\n");
+                        }
                         continue;
                 }
 
