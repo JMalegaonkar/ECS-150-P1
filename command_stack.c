@@ -22,7 +22,7 @@ int is_empty(CommandStack* s)
     {
         fprintf(stderr, "Cannot work with NULL stack.\n");
     }
-    return s->top < 0;
+    return s->top > 0;
 }
 
 void double_size(CommandStack* s)
@@ -44,8 +44,9 @@ void push(CommandStack* s, char* directory)
     if(s->top >= s->max_size - 1) double_size(s);
 
     s->top++;
+    printf("%d\n", s->top);
     s->stack[s->top] = (char*) malloc((strlen(directory) + 1) * sizeof(char));
-    strcpy(s->stack[s->top],directory);
+    strcpy(s->stack[s->top], directory);
 }
 
 void pop(CommandStack* s) 

@@ -104,9 +104,6 @@ int main(void)
                 }
 
 
-                // Create command stack
-                CommandStack* command_stack = create_stack(512);
-
                 // Handle "exit" command
                 if (!strcmp(command_input, "exit")) 
                 {
@@ -122,32 +119,37 @@ int main(void)
                         continue;
                 }
 
-                if (!strcmp(command_input, "dirs")) 
+
+                
+                // Parses command_input to create Command object
+                CommandPipeline* command_pipeline = create_command_pipeline(command_input);
+
+                // Create command stack
+                CommandStack* command_stack = create_stack(CMDLINE_MAX);
+
+
+                if (!strcmp(command_pipeline->commands[0]->cmd, "dirs")) 
                 {
                         get_commands(command_stack, getcwd(cwd, sizeof(cwd) * sizeof(char)));
                         continue;
                 }
 
-                if (!strcmp(command_input, "pushd")) 
+
+                if (!strcmp(command_pipeline->commands[0]->cmd, "pushd")) 
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
                         push(command_stack, cwd);
-                        printf("pushed\n");
+                        chdir(command_pipeline->commands[0]->args[0]);
                         continue;
                 }
 
-                int pop_change = 0;
-                if (!strcmp(command_input, "popd")) 
+                if (!strcmp(command_pipeline->commands[0]->cmd, "popd")) 
                 {
                         pop(command_stack);
-                        if (command_stack->top > -1) pop_change = 1;
+                        if (command_stack->top > -1) chdir(top(command_stack));
                         continue;
                 }
 
-                
-               
-                // Parses command_input to create Command object
-                CommandPipeline* command_pipeline = create_command_pipeline(command_input);
 
                 // Executes fork + exec + wait loop to execute command
                 if (fork() == 0) // child process
@@ -174,22 +176,17 @@ int main(void)
                                 command_pipeline->commands_length == 1 && 
                                 !strcmp(command_pipeline->commands[0]->cmd, "cd") && 
                                 command_pipeline->commands[0]->args_len == 1;
-                                                // Handle "cd" command
-                        int is_command_pushd = 
-                                command_pipeline->commands_length == 1 && 
-                                !strcmp(command_pipeline->commands[0]->cmd, "pushd") && 
-                                command_pipeline->commands[0]->args_len == 1;
+                                        
+                        // int is_command_pushd = 
+                        //         command_pipeline->commands_length == 1 && 
+                        //         !strcmp(command_pipeline->commands[0]->cmd, "pushd") && 
+                        //         command_pipeline->commands[0]->args_len == 1;
 
 
-                        if (is_command_cd || is_command_pushd)
+                        if (is_command_cd)
                         {
                                 chdir(command_pipeline->commands[0]->args[0]);
                         }
-                        else if (pop_change)
-                        {
-                                chdir(top(command_stack));
-                        } 
-
 
                         // Execute command
                         WIFEXITED(retval)
