@@ -77,6 +77,8 @@ int main(void)
         char command_input[CMDLINE_MAX];
         char cwd[PATH_MAX];
 
+        CommandStack* command_stack = create_stack(CMDLINE_MAX);
+
         while (1) 
         {
                 char *nl;
@@ -125,7 +127,6 @@ int main(void)
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
 
                 // Create command stack
-                CommandStack* command_stack = create_stack(CMDLINE_MAX);
 
 
                 if (!strcmp(command_pipeline->commands[0]->cmd, "dirs")) 
@@ -145,8 +146,8 @@ int main(void)
 
                 if (!strcmp(command_pipeline->commands[0]->cmd, "popd")) 
                 {
+                        if (command_stack->top > 0) chdir(top(command_stack));
                         pop(command_stack);
-                        if (command_stack->top > -1) chdir(top(command_stack));
                         continue;
                 }
 

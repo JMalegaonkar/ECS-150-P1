@@ -11,7 +11,7 @@ CommandStack* create_stack(int size)
 
     ret_stack->max_size = size;
     ret_stack->top = -1;
-    ret_stack->stack = (char**) malloc(sizeof(char) * size);
+    ret_stack->stack = (char**) malloc(sizeof(char*) * size);
 
     return ret_stack;
 }
@@ -22,7 +22,7 @@ int is_empty(CommandStack* s)
     {
         fprintf(stderr, "Cannot work with NULL stack.\n");
     }
-    return s->top > 0;
+    return s->top < 0;
 }
 
 void double_size(CommandStack* s)
@@ -36,15 +36,13 @@ void double_size(CommandStack* s)
     }
     free(s->stack);
     s->stack = doubled_stack;
-
 }
 
 void push(CommandStack* s, char* directory)
 {
-    if(s->top >= s->max_size - 1) double_size(s);
+    if(s->top >= (s->max_size - 1)/2) double_size(s);
 
     s->top++;
-    printf("%d\n", s->top);
     s->stack[s->top] = (char*) malloc((strlen(directory) + 1) * sizeof(char));
     strcpy(s->stack[s->top], directory);
 }
@@ -66,11 +64,15 @@ char* top(CommandStack* s)
 void get_commands(CommandStack* s, char* cwd)
 {
     if (is_empty(s))
-    {
+    {   
         fprintf(stderr, "%s\n", cwd);
-    } 
+    }
+    else
+    {
+        printf("%s\n", cwd);
+    }
 
-    for (int i = s->top; i > -1; i --)
+    for (int i = s->top; i >= 0; i--)
     {
         printf("%s\n", s->stack[i]);
     }
