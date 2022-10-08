@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include "command.h"
 #include "command_pipeline.h"
+#include "command_stack.h"
 
 #define CMDLINE_MAX 512
 
@@ -102,6 +103,10 @@ int main(void)
                         *nl = '\0';
                 }
 
+
+                // Create command stack
+                CommandStack* command_stack = create_stack(512);
+
                 // Handle "exit" command
                 if (!strcmp(command_input, "exit")) 
                 {
@@ -116,7 +121,31 @@ int main(void)
                         printf("%s\n", cwd);
                         continue;
                 }
+
+                if (!strcmp(command_input, "dirs")) 
+                {
+                        get_commands(command_stack, getcwd(cwd, sizeof(cwd) * sizeof(char)));
+                        continue;
+                }
+
+                if (!strcmp(command_input, "pushd")) 
+                {
+                        getcwd(cwd, sizeof(cwd) * sizeof(char));
+                        push(command_stack, cwd);
+                        printf("pushed\n");
+                        continue;
+                }
+
+                int pop_change = 0;
+                if (!strcmp(command_input, "popd")) 
+                {
+                        pop(command_stack);
+                        if (command_stack->top > -1) pop_change = 1;
+                        continue;
+                }
+
                 
+               
                 // Parses command_input to create Command object
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
 
@@ -145,10 +174,22 @@ int main(void)
                                 command_pipeline->commands_length == 1 && 
                                 !strcmp(command_pipeline->commands[0]->cmd, "cd") && 
                                 command_pipeline->commands[0]->args_len == 1;
-                        if (is_command_cd)
+                                                // Handle "cd" command
+                        int is_command_pushd = 
+                                command_pipeline->commands_length == 1 && 
+                                !strcmp(command_pipeline->commands[0]->cmd, "pushd") && 
+                                command_pipeline->commands[0]->args_len == 1;
+
+
+                        if (is_command_cd || is_command_pushd)
                         {
                                 chdir(command_pipeline->commands[0]->args[0]);
                         }
+                        else if (pop_change)
+                        {
+                                chdir(top(command_stack));
+                        } 
+
 
                         // Execute command
                         WIFEXITED(retval)
