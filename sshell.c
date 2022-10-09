@@ -110,7 +110,7 @@ int main(void)
                 // Handle "exit" command
                 if (!strcmp(command_input, "exit")) 
                 {
-                        fprintf(stderr, "\nBye...\n");
+                        fprintf(stderr, "Bye...\n");
                         fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         break;
                 }
@@ -120,11 +120,11 @@ int main(void)
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
                         printf("%s\n", cwd);
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         continue;
                 }
 
 
-                
                 // Parses command_input to create Command object
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
 
@@ -134,7 +134,7 @@ int main(void)
                 if (!strcmp(command_pipeline->commands[0]->cmd, "dirs")) 
                 {
                         get_commands(command_stack, getcwd(cwd, sizeof(cwd) * sizeof(char)));
-                        fprintf(stderr, "+ completed '%s' [0]\n", command_input)
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
 
                         continue;
                 }
@@ -143,12 +143,16 @@ int main(void)
                 if (!strcmp(command_pipeline->commands[0]->cmd, "pushd")) 
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
-                        push(command_stack, cwd);
                         if (chdir(command_pipeline->commands[0]->args[0]) == -1)
                         {
                                 fprintf(stderr, "Error: no such directory\n");
                         }
-                        fprintf(stderr, "+ completed '%s' [0]\n", command_input)
+                        else
+                        {
+                            push(command_stack, cwd);    
+                        }
+                        
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         continue;
                 }
 
@@ -156,7 +160,7 @@ int main(void)
                 {
                         if (command_stack->top > 0) chdir(top(command_stack));
                         pop(command_stack);
-                        fprintf(stderr, "+ completed '%s' [0]\n", command_input)
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         continue;
                 }
 
