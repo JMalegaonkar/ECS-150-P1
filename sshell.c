@@ -85,7 +85,8 @@ int main(void)
                 int retval;
 
                 // Print prompt
-                fprintf(stderr, "sshell@ucd$ ");
+                // fprintf(stderr, "sshell@ucd$ ");
+                fprintf(stdout, "sshell@ucd$ ");
                 fflush(stdout);
 
                 // Get command line
@@ -109,7 +110,8 @@ int main(void)
                 // Handle "exit" command
                 if (!strcmp(command_input, "exit")) 
                 {
-                        fprintf(stderr, "Bye...\n+ completed '%s' [0]\n", command_input);
+                        fprintf(stderr, "\nBye...\n");
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         break;
                 }
 
@@ -132,6 +134,8 @@ int main(void)
                 if (!strcmp(command_pipeline->commands[0]->cmd, "dirs")) 
                 {
                         get_commands(command_stack, getcwd(cwd, sizeof(cwd) * sizeof(char)));
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input)
+
                         continue;
                 }
 
@@ -144,6 +148,7 @@ int main(void)
                         {
                                 fprintf(stderr, "Error: no such directory\n");
                         }
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input)
                         continue;
                 }
 
@@ -151,6 +156,7 @@ int main(void)
                 {
                         if (command_stack->top > 0) chdir(top(command_stack));
                         pop(command_stack);
+                        fprintf(stderr, "+ completed '%s' [0]\n", command_input)
                         continue;
                 }
 
