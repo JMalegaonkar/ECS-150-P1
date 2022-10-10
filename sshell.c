@@ -77,6 +77,7 @@ int main(void)
         char command_input[CMDLINE_MAX];
         char cwd[PATH_MAX];
 
+        // Creates command stack
         CommandStack* command_stack = create_stack(CMDLINE_MAX);
 
         while (1) 
@@ -128,9 +129,8 @@ int main(void)
                 // Parses command_input to create Command object
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
 
-                // Create command stack
 
-
+                // Handle "dirs" command
                 if (!strcmp(command_pipeline->commands[0]->cmd, "dirs")) 
                 {
                         get_commands(command_stack, getcwd(cwd, sizeof(cwd) * sizeof(char)));
@@ -139,7 +139,7 @@ int main(void)
                         continue;
                 }
 
-
+                // Handle "pushd" command
                 if (!strcmp(command_pipeline->commands[0]->cmd, "pushd")) 
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
@@ -156,6 +156,7 @@ int main(void)
                         continue;
                 }
 
+                // Handle "popd" command
                 if (!strcmp(command_pipeline->commands[0]->cmd, "popd")) 
                 {
                         if (command_stack->top > -1) chdir(top(command_stack));
@@ -191,11 +192,6 @@ int main(void)
                                 !strcmp(command_pipeline->commands[0]->cmd, "cd") && 
                                 command_pipeline->commands[0]->args_len == 1;
                                         
-                        // int is_command_pushd = 
-                        //         command_pipeline->commands_length == 1 && 
-                        //         !strcmp(command_pipeline->commands[0]->cmd, "pushd") && 
-                        //         command_pipeline->commands[0]->args_len == 1;
-
 
                         if (is_command_cd)
                         {
