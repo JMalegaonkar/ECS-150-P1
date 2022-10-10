@@ -6,10 +6,9 @@
 // https://d-michail.github.io/assets/teaching/data-structures/015_StackImplementation.en.pdf
 typedef struct CommandStack
 {
-   char ** stack;
+   char** stack;
    int max_size;
    int top;
-
 } CommandStack;
 
 CommandStack* create_stack(int size);
