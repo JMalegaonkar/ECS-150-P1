@@ -158,7 +158,7 @@ int main(void)
 
                 if (!strcmp(command_pipeline->commands[0]->cmd, "popd")) 
                 {
-                        if (command_stack->top > 0) chdir(top(command_stack));
+                        if (command_stack->top > -1) chdir(top(command_stack));
                         pop(command_stack);
                         fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         continue;
