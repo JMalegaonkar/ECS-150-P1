@@ -102,7 +102,6 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     char** seperated_pipe_commands = separate_commands(CommandPipeline* command_pipeline_object, char** seperated_command_string, const char* PIPE_SEPARATOR);
 
-
     populate_commands(CommandPipeline* command_pipeline_object, char** seperated_pipe_commands);
 
     free(seperated_command_string);
