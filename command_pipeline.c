@@ -106,6 +106,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     populate_commands(command_pipeline_object, seperated_pipe_commands);
 
+    free(full_command_string);
     free(seperated_command_string);
     free(seperated_pipe_commands);
 
