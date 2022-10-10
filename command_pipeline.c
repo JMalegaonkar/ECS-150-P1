@@ -25,7 +25,6 @@ char** separate_file(CommandPipeline* command_pipeline_object, char* full_comman
         token = strtok(NULL, FILE_SEPARATOR);
         command_pipeline_object->seperated_chunks++;
     }
-    free(full_command_string);
 
     return seperated_command_string;
 }
@@ -93,7 +92,6 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     // create new Command Pipeline object
     CommandPipeline* command_pipeline_object = (CommandPipeline*) malloc(sizeof(CommandPipeline));
-
 
     char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
     strcpy(full_command_string, command_string);
