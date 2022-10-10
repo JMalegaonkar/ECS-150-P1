@@ -2,6 +2,7 @@
 
 ToDo:
 - Fix free for inner char* for char** objects in command_pipeline (check valgrind)
+- Pipelining must support multiple status codes (i.e. [0][0][0])
 
 Notes:
 - Make sure "exit > file1.txt" created file1.txt if it DNE and populates it with "Bye..."
