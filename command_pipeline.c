@@ -8,10 +8,8 @@
 
 
 
-char** separate_file(CommandPipeline* command_pipeline_object, char* command_string, const char* FILE_SEPARATOR)
+char** separate_file(CommandPipeline* command_pipeline_object, char* full_command_string, const char* FILE_SEPARATOR)
 {
-    char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
-    strcpy(full_command_string, command_string);
 
     char* token = strtok(full_command_string, FILE_SEPARATOR);   
     char** seperated_command_string = (char**) malloc(2 * sizeof(char*));
@@ -66,7 +64,7 @@ char** separate_commands(CommandPipeline* command_pipeline_object, char** sepera
     {
         seperated_pipe_commands[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
         strcpy(seperated_pipe_commands[i], token);
-        seperated_pipe_commands[i] = strip_whitespace(pipe_commands[i]);
+        seperated_pipe_commands[i] = strip_whitespace(seperated_pipe_commands[i]);
         token = strtok(NULL, PIPE_SEPARATOR);
     } 
     free(pipe_string1);
@@ -96,13 +94,17 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     // create new Command Pipeline object
     CommandPipeline* command_pipeline_object = (CommandPipeline*) malloc(sizeof(CommandPipeline));
 
-    char** seperated_command_string = separate_file(command_pipeline_object, command_string, PIPE_SEPARATOR);
+
+    char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
+    strcpy(full_command_string, command_string);
+
+    char** seperated_command_string = separate_file(command_pipeline_object, full_command_string, FILE_SEPARATOR);
 
     populate_output_file(command_pipeline_object, seperated_command_string);
 
-    char** seperated_pipe_commands = separate_commands(CommandPipeline* command_pipeline_object, char** seperated_command_string, const char* PIPE_SEPARATOR);
+    char** seperated_pipe_commands = separate_commands(command_pipeline_object,seperated_command_string, PIPE_SEPARATOR);
 
-    populate_commands(CommandPipeline* command_pipeline_object, char** seperated_pipe_commands);
+    populate_commands(command_pipeline_object, seperated_pipe_commands);
 
     free(seperated_command_string);
     free(seperated_pipe_commands);
