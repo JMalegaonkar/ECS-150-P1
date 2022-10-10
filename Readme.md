@@ -1,7 +1,7 @@
 # ECS 150 - Project 1
 
 ToDo:
-- phase 6
+- Fix free for inner char* for char** objects in command_pipeline (check valgrind)
 
 Notes:
 - Make sure "exit > file1.txt" created file1.txt if it DNE and populates it with "Bye..."
