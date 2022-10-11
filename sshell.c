@@ -140,6 +140,10 @@ int main(void)
                 if (is_command_cd)
                 {
                         int status_code = chdir(command_pipeline->commands[0]->args[0]);
+                        if (status_code == -1)
+                        {
+                                fprintf(stderr, "Error: cannot cd into directory\n");
+                        }
                         fprintf(stderr, "+ completed '%s' [%d]\n", command_input, status_code ? 1 : 0);
                         continue;
                 }
