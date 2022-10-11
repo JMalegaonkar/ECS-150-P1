@@ -38,6 +38,7 @@ void populate_output_file(CommandPipeline* command_pipeline_object, char** seper
     {
         command_pipeline_object->output_file = (char*) malloc((strlen(seperated_command_string[1]) + 1) * sizeof(char));
         strcpy(command_pipeline_object->output_file, seperated_command_string[1]);
+        command_pipeline_object->output_file = strip_whitespace(command_pipeline_object->output_file);
     } 
 }
 
@@ -91,6 +92,7 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
     for (int i=0; i<command_pipeline->commands_length; i++)
     {
         Command* command = command_pipeline->commands[i];
+        
         if (!strcmp(command->cmd, "ls"))
         {
             int number_directories = 0;
@@ -111,10 +113,21 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
         }
     }
 
-    // Check for invalid output file
-    if (command_pipeline->output_file != NULL)
+    const char* output_file = command_pipeline->output_file;
+    if (output_file != NULL)
     {
-        int fd = open(command_pipeline->output_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
+        // Check for misplaced output redirection
+        for (unsigned i=0; i<strlen(output_file); i++)
+        {
+            if (output_file[i] == ' ')
+            {
+                fprintf(stderr, "Error: mislocated output redirection\n");
+                return 1;
+            }
+        }
+
+        // Check for invalid output file
+        int fd = open(output_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
         close(fd);
         if (fd == -1)
         {
