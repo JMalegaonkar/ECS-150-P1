@@ -33,7 +33,9 @@ void double_size(CommandStack* s)
     {
         doubled_stack[i] = (char*) malloc((strlen(s->stack[i]) + 1) * sizeof(char));
         strcpy(doubled_stack[i],s->stack[i]);
+        free(s->stack[i]);
     }
+
     free(s->stack);
     s->stack = doubled_stack;
 }
@@ -50,7 +52,7 @@ void push(CommandStack* s, char* directory)
 void pop(CommandStack* s) 
 {
     if (is_empty(s)) fprintf(stderr, "Error: directory stack empty\n");
-
+    free(s->stack[s->top]);
     s->top--;
 }
 
