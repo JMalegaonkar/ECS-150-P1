@@ -130,7 +130,7 @@ int main(void)
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
                 
                 // Validate for Parsing Errors
-                if (validate_command_pipeline(command_pipeline))
+                if (command_pipeline == NULL)
                 {
                         continue;
                 }

@@ -10,7 +10,6 @@
 
 char** separate_file(CommandPipeline* command_pipeline_object, char* full_command_string, const char* FILE_SEPARATOR)
 {
-
     char* token = strtok(full_command_string, FILE_SEPARATOR);   
     char** seperated_command_string = (char**) malloc(2 * sizeof(char*));
 
@@ -84,33 +83,6 @@ void populate_commands(CommandPipeline* command_pipeline_object, char** seperate
     }
 }
 
-CommandPipeline* create_command_pipeline(const char* command_string)
-{
-    // tokens for parsing
-    const char* FILE_SEPARATOR = ">";
-    const char* PIPE_SEPARATOR = "|";
-
-    // create new Command Pipeline object
-    CommandPipeline* command_pipeline_object = (CommandPipeline*) malloc(sizeof(CommandPipeline));
-
-    char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
-    strcpy(full_command_string, command_string);
-
-    char** seperated_command_string = separate_file(command_pipeline_object, full_command_string, FILE_SEPARATOR);
-
-    populate_output_file(command_pipeline_object, seperated_command_string);
-
-    char** seperated_pipe_commands = separate_commands(command_pipeline_object,seperated_command_string, PIPE_SEPARATOR);
-
-    populate_commands(command_pipeline_object, seperated_pipe_commands);
-
-    free(full_command_string);
-    free(seperated_command_string);
-    free(seperated_pipe_commands);
-
-    return command_pipeline_object;
-}
-
 int validate_command_pipeline(const CommandPipeline* command_pipeline)
 {
     // Check for too many arguments for ls
@@ -139,6 +111,50 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
 
     return 0;
 }
+
+CommandPipeline* create_command_pipeline(const char* command_string)
+{
+    // tokens for parsing
+    const char* FILE_SEPARATOR = ">";
+    const char* PIPE_SEPARATOR = "|";
+
+    // create new Command Pipeline object
+    CommandPipeline* command_pipeline_object = (CommandPipeline*) malloc(sizeof(CommandPipeline));
+
+    char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
+    strcpy(full_command_string, command_string);
+    full_command_string = strip_whitespace(full_command_string);
+
+    int is_missing_command = 
+        full_command_string[0] == '>' || 
+        full_command_string[0] == '|' ||
+        full_command_string[strlen(full_command_string)-1] == '|';
+    if (is_missing_command)
+    {
+        fprintf(stderr, "Error: missing command\n");
+        return NULL;
+    }
+
+    char** seperated_command_string = separate_file(command_pipeline_object, full_command_string, FILE_SEPARATOR);
+
+    populate_output_file(command_pipeline_object, seperated_command_string);
+
+    char** seperated_pipe_commands = separate_commands(command_pipeline_object,seperated_command_string, PIPE_SEPARATOR);
+
+    populate_commands(command_pipeline_object, seperated_pipe_commands);
+
+    free(full_command_string);
+    free(seperated_command_string);
+    free(seperated_pipe_commands);
+
+    if (validate_command_pipeline(command_pipeline_object))
+    {
+        return NULL;
+    }
+
+    return command_pipeline_object;
+}
+
 
 
 
