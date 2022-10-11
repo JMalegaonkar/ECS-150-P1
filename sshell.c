@@ -125,11 +125,22 @@ int main(void)
                         continue;
                 }
 
-
                 // Parses command_input to create Command object
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
                 if (command_pipeline == NULL)
                 {
+                        continue;
+                }
+
+                // Handles "cd" command
+                int is_command_cd = 
+                        command_pipeline->commands_length == 1 && 
+                        !strcmp(command_pipeline->commands[0]->cmd, "cd") && 
+                        command_pipeline->commands[0]->args_len == 1;
+                if (is_command_cd)
+                {
+                        int status_code = chdir(command_pipeline->commands[0]->args[0]);
+                        fprintf(stderr, "+ completed '%s' [%d]\n", command_input, status_code ? 1 : 0);
                         continue;
                 }
 
@@ -188,18 +199,6 @@ int main(void)
                 {
                         // Wait for child process to complete
                         wait(&retval);
-
-                        // Handle "cd" command
-                        int is_command_cd = 
-                                command_pipeline->commands_length == 1 && 
-                                !strcmp(command_pipeline->commands[0]->cmd, "cd") && 
-                                command_pipeline->commands[0]->args_len == 1;
-                                        
-
-                        if (is_command_cd)
-                        {
-                                chdir(command_pipeline->commands[0]->args[0]);
-                        }
 
                         // Execute command
                         WIFEXITED(retval)
