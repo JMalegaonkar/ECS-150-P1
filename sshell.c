@@ -128,7 +128,7 @@ int main(void)
                 if (!strcmp(command_input, "pwd")) 
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
-                        fprintf(stderr, "%s\n", cwd);
+                        fprintf(stdout, "%s\n", cwd);
                         fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         continue;
                 }
