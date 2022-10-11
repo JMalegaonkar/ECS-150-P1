@@ -3,6 +3,8 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "command_pipeline.h"
 #include "string_utilities.h"
 
@@ -106,6 +108,18 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
                 fprintf(stderr, "Error: too many process arguments\n");
                 return 1;
             }
+        }
+    }
+
+    // Check for invalid output file
+    if (command_pipeline->output_file != NULL)
+    {
+        int fd = open(command_pipeline->output_file, O_TRUNC | O_WRONLY | O_CREAT, 0666);
+        close(fd);
+        if (fd == -1)
+        {
+            fprintf(stderr, "Error: cannot open output file\n");
+            return 1;
         }
     }
 
