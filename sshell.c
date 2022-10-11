@@ -128,7 +128,12 @@ int main(void)
 
                 // Parses command_input to create Command object
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
-
+                
+                // Validate for Parsing Errors
+                if (validate_command_pipeline(command_pipeline))
+                {
+                        continue;
+                }
 
                 // Handle "dirs" command
                 if (!strcmp(command_pipeline->commands[0]->cmd, "dirs")) 

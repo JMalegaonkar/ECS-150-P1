@@ -111,5 +111,34 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     return command_pipeline_object;
 }
 
+int validate_command_pipeline(const CommandPipeline* command_pipeline)
+{
+    // Check for too many arguments for ls
+    for (int i=0; i<command_pipeline->commands_length; i++)
+    {
+        Command* command = command_pipeline->commands[i];
+        if (!strcmp(command->cmd, "ls"))
+        {
+            int number_directories = 0;
+            for (int j=0; j<command->args_len; j++)
+            {
+                char* argument = command->args[j];
+                assert(strlen(argument) > 0);
+                if (argument[0] != '-')
+                {
+                    number_directories++;
+                }
+            }
+            if (number_directories > 1)
+            {
+                fprintf(stderr, "Error: too many process arguments\n");
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
 
 
