@@ -172,9 +172,13 @@ int main(void)
                 // Handle "popd" command
                 if (!strcmp(command_pipeline->commands[0]->cmd, "popd")) 
                 {
-                        if (command_stack->top > -1) chdir(top(command_stack));
+                        int status_code = (command_stack->top > -1) ? 0 : 1;
+                        if (!status_code) 
+                        {
+                                chdir(top(command_stack));
+                        }
                         pop(command_stack);
-                        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
+                        fprintf(stderr, "+ completed '%s' [%d]\n", command_input, status_code);
                         continue;
                 }
 
