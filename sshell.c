@@ -160,16 +160,12 @@ int main(void)
                 if (!strcmp(command_pipeline->commands[0]->cmd, "pushd")) 
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
-                        if (chdir(command_pipeline->commands[0]->args[0]) == -1)
-                        {
-                                fprintf(stderr, "Error: no such directory\n");
-                        }
-                        else
-                        {
-                            push(command_stack, cwd);    
-                        }
+                        int status_code = chdir(command_pipeline->commands[0]->args[0]);
+                        (status_code == -1)
+                                ? fprintf(stderr, "Error: no such directory\n")
+                                : push(command_stack, cwd);
                         
-                        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
+                        fprintf(stderr, "+ completed '%s' [%d]\n", command_input, status_code ? 1 : 0);
                         continue;
                 }
 
