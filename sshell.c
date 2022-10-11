@@ -23,15 +23,14 @@ void execute_command(Command *command, int command_idx)
                         return;
                 }
 
-                int fd = open(command->input_file, O_WRONLY, 0644);
+                int fd = open(command->input_file, O_RDONLY, 0);
                 if (fd < 0)
                 {
                         fprintf(stderr, "Error: cannot open input file\n");
                         return;
                 }
 
-                dup2(STDIN_FILENO, fd);
-                close(STDIN_FILENO);
+                dup2(fd, STDIN_FILENO);
         }
 
         char *argv[command->args_len + 2];
