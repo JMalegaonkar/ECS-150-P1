@@ -175,14 +175,14 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     populate_commands(command_pipeline_object, seperated_pipe_commands);
 
     free(full_command_string);
-    for (int i = 0; i < strlen(seperated_command_string); i++)
+    for (int i = 0; i < command_pipeline_object->commands_length; i++)
     {
-        free(seperated_command_string[i])
+        free(seperated_command_string[i]);
     }
     free(seperated_command_string);
-        for (int i = 0; i < strlen(seperated_pipe_string); i++)
+    for (int i = 0; i < command_pipeline_object->commands_length; i++)
     {
-        free(seperated_pipe_string[i])
+        free(seperated_pipe_commands[i]);
     }
     free(seperated_pipe_commands);
 

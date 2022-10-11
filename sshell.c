@@ -117,6 +117,7 @@ int main(void)
                         }
 
                         free(command_stack->stack);
+                        free(command_stack);
 
                         fprintf(stderr, "Bye...\n");
                         fprintf(stderr, "+ completed '%s' [0]\n", command_input);
