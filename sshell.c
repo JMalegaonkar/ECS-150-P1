@@ -110,6 +110,14 @@ int main(void)
                 // Handle "exit" command
                 if (!strcmp(command_input, "exit")) 
                 {
+
+                        for (int i = 0; i < command_stack->top ; i ++)
+                        {
+                                free(command_stack->stack[i]);
+                        }
+
+                        free(command_stack->stack);
+
                         fprintf(stderr, "Bye...\n");
                         fprintf(stderr, "+ completed '%s' [0]\n", command_input);
                         break;
