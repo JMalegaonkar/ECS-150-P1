@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -43,7 +44,9 @@ void execute_command(Command *command, int command_idx)
         argv[command->args_len + 1] = NULL;
 
         execvp(command->cmd, argv);
-        perror("execvp");
+        (errno == ENOENT)
+                ? fprintf(stderr, "Error: command not found\n")
+                : perror("execvp");
         exit(1);
 }
 
