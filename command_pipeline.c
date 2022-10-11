@@ -135,6 +135,13 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         return NULL;
     }
 
+    int is_missing_output_file = full_command_string[strlen(full_command_string)-1] == '>';
+    if (is_missing_output_file)
+    {
+        fprintf(stderr, "Error: no output file\n");
+        return NULL;
+    }
+
     char** seperated_command_string = separate_file(command_pipeline_object, full_command_string, FILE_SEPARATOR);
 
     populate_output_file(command_pipeline_object, seperated_command_string);
