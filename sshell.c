@@ -128,8 +128,6 @@ int main(void)
 
                 // Parses command_input to create Command object
                 CommandPipeline* command_pipeline = create_command_pipeline(command_input);
-                
-                // Validate for Parsing Errors
                 if (command_pipeline == NULL)
                 {
                         continue;
