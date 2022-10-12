@@ -110,7 +110,6 @@ int main(void)
                         *nl = '\0';
                 }
 
-
                 // Handle "exit" command
                 if (!strcmp(command_input, "exit"))
                 {
