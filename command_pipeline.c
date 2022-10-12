@@ -146,12 +146,12 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     free(pipe_string);
 
     command_pipeline_object->commands = (Command**) malloc(command_pipeline_object->commands_length * sizeof(Command*));
-    for (unsigned i = 0; i < command_pipeline_object->commands_length; i++)
+    for (int i = 0; i < command_pipeline_object->commands_length; i++)
     {
         command_pipeline_object->commands[i] = create_command(pipe_commands[i]);
     }
 
-    for (unsigned i = 0; i < command_pipeline_object->commands_length; i++)
+    for (int i = 0; i < command_pipeline_object->commands_length; i++)
     {
         free(pipe_commands[i]);
     }
