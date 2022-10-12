@@ -88,7 +88,6 @@ int main(void)
                 int retval;
 
                 // Print prompt
-                // fprintf(stderr, "sshell@ucd$ ");
                 fprintf(stdout, "sshell@ucd$ ");
                 fflush(stdout);
 
