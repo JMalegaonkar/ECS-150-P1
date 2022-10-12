@@ -154,11 +154,6 @@ void parse_pipelined_commands(
     for (int i = 0; i < command_pipeline_object->commands_length; i++)
     {
         command_pipeline_object->commands[i] = create_command(stripped_pipe_commands[i]);
-    }
-
-    // Free command strings
-    for (int i = 0; i < command_pipeline_object->commands_length; i++)
-    {
         free(pipe_commands[i]);
     }
 }
