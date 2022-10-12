@@ -91,12 +91,13 @@ int validate_raw_command_string(char* command_string)
 }
 
 void parse_output_redirection(
-    char* token,
+    char* stripped_full_command_string,
     char** seperated_command_string,
     char** stripped_seperated_command_string,
     CommandPipeline* command_pipeline_object,
     const char* seperator)
 {
+    char* token = strtok(stripped_full_command_string, seperator);
     int chunks = 0;
     for (unsigned i = 0; token != NULL; i++)
     {
@@ -176,15 +177,22 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     }
 
     // Parse output redirection
-    char* token = strtok(stripped_full_command_string, FILE_SEPARATOR);
     char* seperated_command_string[2] = { NULL, NULL };
     char* stripped_seperated_command_string[2] = { NULL, NULL };
-    parse_output_redirection(token, seperated_command_string, stripped_seperated_command_string, command_pipeline_object, FILE_SEPARATOR);
+    parse_output_redirection(
+        stripped_full_command_string,
+        seperated_command_string,
+        stripped_seperated_command_string,
+        command_pipeline_object,
+        FILE_SEPARATOR);
     free(full_command_string);
 
     // Parse pipelined commands
     char* main_command_string = stripped_seperated_command_string[0];
-    parse_pipelined_commands(main_command_string, command_pipeline_object, PIPE_SEPARATOR);
+    parse_pipelined_commands(
+        main_command_string,
+        command_pipeline_object,
+        PIPE_SEPARATOR);
     free(seperated_command_string[0]);
 
     if (validate_command_pipeline(command_pipeline_object))
