@@ -72,31 +72,31 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
     strcpy(full_command_string, command_string);
-    full_command_string = strip_whitespace(full_command_string);
+    char* stripped_full_command_string = strip_whitespace(full_command_string);
 
-    if (strlen(full_command_string) == 0)
+    if (strlen(stripped_full_command_string) == 0)
     {
         return NULL;
     }
 
     int is_missing_command =
-        full_command_string[0] == '>' ||
-        full_command_string[0] == '|' ||
-        full_command_string[strlen(full_command_string)-1] == '|';
+        stripped_full_command_string[0] == '>' ||
+        stripped_full_command_string[0] == '|' ||
+        stripped_full_command_string[strlen(stripped_full_command_string)-1] == '|';
     if (is_missing_command)
     {
         fprintf(stderr, "Error: missing command\n");
         return NULL;
     }
 
-    int is_missing_output_file = full_command_string[strlen(full_command_string)-1] == '>';
+    int is_missing_output_file = stripped_full_command_string[strlen(stripped_full_command_string)-1] == '>';
     if (is_missing_output_file)
     {
         fprintf(stderr, "Error: no output file\n");
         return NULL;
     }
 
-    char *token = strtok(full_command_string, FILE_SEPARATOR);
+    char *token = strtok(stripped_full_command_string, FILE_SEPARATOR);
     char *seperated_command_string[2];
     int chunks = 0;
     for (unsigned i = 0; token != NULL; i++)
