@@ -42,7 +42,10 @@ void double_size(CommandStack* s)
 
 void push(CommandStack* s, char* directory)
 {
-    if(s->top >= (s->max_size - 1)/2) double_size(s);
+    if(s->top >= (s->max_size - 1)/2)
+    {
+        double_size(s);
+    }
 
     s->top++;
     s->stack[s->top] = (char*) malloc((strlen(directory) + 1) * sizeof(char));
@@ -51,7 +54,11 @@ void push(CommandStack* s, char* directory)
 
 void pop(CommandStack* s) 
 {
-    if (is_empty(s)) fprintf(stderr, "Error: directory stack empty\n");
+    if (is_empty(s))
+    {
+        fprintf(stderr, "Error: directory stack empty\n");
+    }
+
     if (s->top > -1)
     {
         free(s->stack[s->top]);
@@ -62,7 +69,10 @@ void pop(CommandStack* s)
 
 char* top(CommandStack* s) 
 {
-    if (is_empty(s)) fprintf(stderr, "Error: directory stack empty\n");
+    if (is_empty(s))
+    {
+        fprintf(stderr, "Error: directory stack empty\n");
+    }
 
     return s->stack[s->top];
 }
