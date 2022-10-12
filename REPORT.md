@@ -22,6 +22,7 @@ The implementation of this program followings XXX distinct steps in an continous
 
 We transformed the given skeleton code into `fork`+`exec`+`wait` method (expand more)
 
+
 ## Phase 2
 
 To handle arguments we created a struct named `Command` that could hold the main command given and its arguments/flags.
@@ -91,6 +92,8 @@ typedef struct CommandStack
 When '`pushd` is called by the sshell, we first check if the directory exists else we throw an error; if true the `push()` method is called, the top attribute is increment and memory is allocated on the top of the stack for the string `cwd`. (If the stack is at half-capacity, the double_size method will be called and the stack will be readjusted)
 
 The `dirs` command is implemeted such that when a stack does not exist it prints `cwd`. If a stack exists the `cwd` is printed and then the stack is printed using a simple for loop ranging from the top value to 0.
+
+The `popd` command 
 
 
 ## License
