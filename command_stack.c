@@ -52,7 +52,11 @@ void push(CommandStack* s, char* directory)
 void pop(CommandStack* s) 
 {
     if (is_empty(s)) fprintf(stderr, "Error: directory stack empty\n");
-    free(s->stack[s->top]);
+    if (top > -1)
+    {
+        free(s->stack[s->top]);
+    }
+
     s->top--;
 }
 
