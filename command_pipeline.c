@@ -97,7 +97,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     }
 
     char *token = strtok(full_command_string, FILE_SEPARATOR);
-    char **seperated_command_string = (char**) malloc(2 * sizeof(char*));
+    char *seperated_command_string[2];
     int chunks = 0;
     for (unsigned i = 0; token != NULL; i++)
     {
@@ -144,7 +144,6 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     }
 
     free(seperated_command_string[0]);
-    free(seperated_command_string);
     free(pipe_string);
 
     command_pipeline_object->commands = (Command**) malloc(command_pipeline_object->commands_length * sizeof(Command*));
