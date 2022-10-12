@@ -170,6 +170,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     strcpy(full_command_string, command_string);
     char* stripped_full_command_string = strip_whitespace(full_command_string);
 
+    // Check for "missing command" or "no output file"
     if (!validate_raw_command_string(stripped_full_command_string))
     {
         free(full_command_string);
@@ -195,6 +196,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         PIPE_SEPARATOR);
     free(seperated_command_string[0]);
 
+    // Check for "too many ls arguments", "misplaced output redirection", or "invalid output file"
     if (!validate_command_pipeline(command_pipeline_object))
     {
         return NULL;
