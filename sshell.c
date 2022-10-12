@@ -14,9 +14,9 @@
 
 #define CMDLINE_MAX 512
 
-void execute_command(Command *command, int command_idx)
+void execute_command(Command *command, int is_first_command)
 {
-        if (command_idx == 0 && command->expects_input_file)
+        if (is_first_command && command->expects_input_file)
         {
                 if (command->input_file == NULL)
                 {
@@ -62,7 +62,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, int command_idx
 
                 (command_idx - 1 == 0)
                         ? execute_command(command_pipeline->commands[command_idx-1], command_idx)
-                        : execute_pipeline_command(command_pipeline, command_idx-1);
+                        : execute_pipeline_command(command_pipeline, command_idx-1 == 0);
         }
         else
         {
@@ -70,7 +70,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, int command_idx
                 dup2(fd[0], STDIN_FILENO);
                 close(fd[0]);
 
-                execute_command(command_pipeline->commands[command_idx], command_idx);
+                execute_command(command_pipeline->commands[command_idx], command_idx == 0);
         }
 }
 
@@ -206,7 +206,7 @@ int main(void)
 
                         // Execute command
                         (command_pipeline->commands_length == 1)
-                                ? execute_command(command_pipeline->commands[0], 0)
+                                ? execute_command(command_pipeline->commands[0], 1)
                                 : execute_pipeline_command(command_pipeline, command_pipeline->commands_length-1);
                 }
                 else // parent process
