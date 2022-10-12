@@ -43,7 +43,7 @@ Command* create_command(const char* command_string)
     // Populate args_len
     command_object->args_len = -1;
     token = strtok(command_string1, WHITESPACE_SEPARATOR);
-    while (token != NULL) 
+    while (token != NULL)
     {
         command_object->args_len++;
         token = strtok(NULL, WHITESPACE_SEPARATOR);

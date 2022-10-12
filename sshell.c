@@ -37,7 +37,7 @@ void execute_command(Command *command, int command_idx)
         char *argv[command->args_len + 2];
 
         argv[0] = command->cmd;
-        for (int i=0; i<command->args_len; i++) 
+        for (int i=0; i<command->args_len; i++)
         {
                 argv[i+1] = command->args[i];
         }
@@ -82,7 +82,7 @@ int main(void)
         // Creates command stack
         CommandStack* command_stack = create_stack(CMDLINE_MAX);
 
-        while (1) 
+        while (1)
         {
                 char *nl;
                 int retval;
@@ -96,7 +96,7 @@ int main(void)
                 fgets(command_input, CMDLINE_MAX, stdin);
 
                 // Print command line if stdin is not provided by terminal
-                if (!isatty(STDIN_FILENO)) 
+                if (!isatty(STDIN_FILENO))
                 {
                         printf("%s", command_input);
                         fflush(stdout);
@@ -104,14 +104,14 @@ int main(void)
 
                 // Replace trailing newline from command line with null terminator
                 nl = strchr(command_input, '\n');
-                if (nl) 
+                if (nl)
                 {
                         *nl = '\0';
                 }
 
 
                 // Handle "exit" command
-                if (!strcmp(command_input, "exit")) 
+                if (!strcmp(command_input, "exit"))
                 {
 
                         for (int i = 0; i < command_stack->top ; i ++)
@@ -128,7 +128,7 @@ int main(void)
                 }
 
                 // Handle "pwd" command
-                if (!strcmp(command_input, "pwd")) 
+                if (!strcmp(command_input, "pwd"))
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
                         fprintf(stdout, "%s\n", cwd);
@@ -144,9 +144,9 @@ int main(void)
                 }
 
                 // Handles "cd" command
-                int is_command_cd = 
-                        command_pipeline->commands_length == 1 && 
-                        !strcmp(command_pipeline->commands[0]->cmd, "cd") && 
+                int is_command_cd =
+                        command_pipeline->commands_length == 1 &&
+                        !strcmp(command_pipeline->commands[0]->cmd, "cd") &&
                         command_pipeline->commands[0]->args_len == 1;
                 if (is_command_cd)
                 {
@@ -160,7 +160,7 @@ int main(void)
                 }
 
                 // Handle "dirs" command
-                if (!strcmp(command_pipeline->commands[0]->cmd, "dirs")) 
+                if (!strcmp(command_pipeline->commands[0]->cmd, "dirs"))
                 {
                         get_commands(command_stack, getcwd(cwd, sizeof(cwd) * sizeof(char)));
                         fprintf(stderr, "+ completed '%s' [0]\n", command_input);
@@ -169,23 +169,23 @@ int main(void)
                 }
 
                 // Handle "pushd" command
-                if (!strcmp(command_pipeline->commands[0]->cmd, "pushd")) 
+                if (!strcmp(command_pipeline->commands[0]->cmd, "pushd"))
                 {
                         getcwd(cwd, sizeof(cwd) * sizeof(char));
                         int status_code = chdir(command_pipeline->commands[0]->args[0]);
                         (status_code == -1)
                                 ? fprintf(stderr, "Error: no such directory\n")
                                 : push(command_stack, cwd);
-                        
+
                         fprintf(stderr, "+ completed '%s' [%d]\n", command_input, status_code ? 1 : 0);
                         continue;
                 }
 
                 // Handle "popd" command
-                if (!strcmp(command_pipeline->commands[0]->cmd, "popd")) 
+                if (!strcmp(command_pipeline->commands[0]->cmd, "popd"))
                 {
                         int status_code = (command_stack->top > -1) ? 0 : 1;
-                        if (!status_code) 
+                        if (!status_code)
                         {
                                 chdir(top(command_stack));
                         }
@@ -209,7 +209,7 @@ int main(void)
                         (command_pipeline->commands_length == 1)
                                 ? execute_command(command_pipeline->commands[0], 0)
                                 : execute_pipeline_command(command_pipeline, command_pipeline->commands_length-1);
-                }       
+                }
                 else // parent process
                 {
                         // Wait for child process to complete

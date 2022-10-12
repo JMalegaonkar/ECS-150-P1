@@ -9,7 +9,7 @@ char* strip_whitespace(char *string)
 {
     char *end;
 
-    // strip leading white space 
+    // strip leading white space
     while(isspace((unsigned char)*string))
     {
         string++;
@@ -22,7 +22,7 @@ char* strip_whitespace(char *string)
 
     // strip trailing white space
     end = string + strlen(string) - 1;
-    while(end > string && isspace((unsigned char)*end)) 
+    while(end > string && isspace((unsigned char)*end))
     {
         end--;
     }

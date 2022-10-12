@@ -16,7 +16,7 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
     for (int i=0; i<command_pipeline->commands_length; i++)
     {
         Command* command = command_pipeline->commands[i];
-        
+
         if (!strcmp(command->cmd, "ls"))
         {
             int number_directories = 0;
@@ -74,8 +74,8 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
     strcpy(full_command_string, command_string);
 
-    int is_missing_command = 
-        full_command_string[0] == '>' || 
+    int is_missing_command =
+        full_command_string[0] == '>' ||
         full_command_string[0] == '|' ||
         full_command_string[strlen(full_command_string)-1] == '|';
     if (is_missing_command)
@@ -92,12 +92,12 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     }
 
 
-    char *token = strtok(full_command_string, FILE_SEPARATOR);   
+    char *token = strtok(full_command_string, FILE_SEPARATOR);
     char **seperated_command_string = (char**) malloc(2 * sizeof(char*));
     int chunks = 0;
     for (unsigned i = 0; token != NULL; i++)
     {
-        char * tmp_string = token; 
+        char * tmp_string = token;
         tmp_string = strip_whitespace(tmp_string);
         seperated_command_string[i] = (char*) malloc((strlen(tmp_string) + 1) * sizeof(char));
         strcpy(seperated_command_string[i],tmp_string);
@@ -106,7 +106,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     }
 
     free(full_command_string);
-    
+
     command_pipeline_object->output_file = NULL;
     if (chunks == 2)
     {
@@ -114,14 +114,14 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         strcpy(command_pipeline_object->output_file, seperated_command_string[1]);
         command_pipeline_object->output_file = strip_whitespace(command_pipeline_object->output_file);
     }
-    
+
     free(seperated_command_string[1]);
 
     char* pipe_string = (char*) malloc((strlen(seperated_command_string[0]) + 1) * sizeof(char));
     char* pipe_string2 = (char*) malloc((strlen(seperated_command_string[0]) + 1) * sizeof(char));
     strcpy(pipe_string, seperated_command_string[0]);
     strcpy(pipe_string2, seperated_command_string[0]);
-    
+
     free(seperated_command_string[0]);
     free(seperated_command_string);
 
@@ -129,17 +129,17 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     // Populate commands_length
     command_pipeline_object->commands_length = 0;
     char *token1 = strtok(pipe_string, PIPE_SEPARATOR);
-    while (token1 != NULL) 
+    while (token1 != NULL)
     {
         command_pipeline_object->commands_length++;
         token1 = strtok(NULL, PIPE_SEPARATOR);
     }
-    
+
     char *token2 = strtok(pipe_string2, PIPE_SEPARATOR);
     char **pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
     for (unsigned i = 0; token2 != NULL; i++)
     {
-        char * tmp_string2 = token2; 
+        char * tmp_string2 = token2;
         tmp_string2 = strip_whitespace(tmp_string2);
         pipe_commands[i] = (char*) malloc((strlen(tmp_string2) + 1) * sizeof(char));
         strcpy(pipe_commands[i],tmp_string2);

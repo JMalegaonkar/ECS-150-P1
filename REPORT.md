@@ -13,7 +13,7 @@ The implementation of this program followings XXX distinct steps in an continous
 3. Enter `fork`, `wait`, `exec` segment to handle general commands
 
     a. Handle input (`<`) and output (`>`) redirection using `dup2`
-    
+
     b. Handle pipelined command through recusive `fork`/`dup2` calls to allow Inter-Process Communication (IPC) between multiple processes handling individual commands using `exec`
 
 ### Parsing options
