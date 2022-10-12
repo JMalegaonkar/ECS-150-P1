@@ -134,11 +134,13 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     strcpy(pipe_string, seperated_command_string[0]);
     token = strtok(pipe_string, PIPE_SEPARATOR);
     char **pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
+    char **stripped_pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
+    command_pipeline_object->commands = (Command**) malloc(command_pipeline_object->commands_length * sizeof(Command*));
     for (unsigned i = 0; token != NULL; i++)
     {
         pipe_commands[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
         strcpy(pipe_commands[i], token);
-        pipe_commands[i] = strip_whitespace(pipe_commands[i]);
+        stripped_pipe_commands[i] = strip_whitespace(pipe_commands[i]);
         token = strtok(NULL, PIPE_SEPARATOR);
     }
 
@@ -149,7 +151,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     command_pipeline_object->commands = (Command**) malloc(command_pipeline_object->commands_length * sizeof(Command*));
     for (int i = 0; i < command_pipeline_object->commands_length; i++)
     {
-        command_pipeline_object->commands[i] = create_command(pipe_commands[i]);
+        command_pipeline_object->commands[i] = create_command(stripped_pipe_commands[i]);
     }
 
     for (int i = 0; i < command_pipeline_object->commands_length; i++)
@@ -157,6 +159,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         free(pipe_commands[i]);
     }
     free(pipe_commands);
+    free(stripped_pipe_commands);
 
     if (validate_command_pipeline(command_pipeline_object))
     {
