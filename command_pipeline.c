@@ -68,11 +68,11 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     const char* FILE_SEPARATOR = ">";
     const char* PIPE_SEPARATOR = "|";
 
-
     CommandPipeline* command_pipeline_object = (CommandPipeline*) malloc(sizeof(CommandPipeline));
 
     char* full_command_string = (char*) malloc((strlen(command_string) + 1) * sizeof(char));
     strcpy(full_command_string, command_string);
+    full_command_string = strip_whitespace(full_command_string);
 
     int is_missing_command =
         full_command_string[0] == '>' ||
