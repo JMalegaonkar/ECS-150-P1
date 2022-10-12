@@ -91,16 +91,14 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         return NULL;
     }
 
-
     char *token = strtok(full_command_string, FILE_SEPARATOR);
     char **seperated_command_string = (char**) malloc(2 * sizeof(char*));
     int chunks = 0;
     for (unsigned i = 0; token != NULL; i++)
     {
-        char * tmp_string = token;
-        tmp_string = strip_whitespace(tmp_string);
-        seperated_command_string[i] = (char*) malloc((strlen(tmp_string) + 1) * sizeof(char));
-        strcpy(seperated_command_string[i],tmp_string);
+        seperated_command_string[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
+        strcpy(seperated_command_string[i], token);
+        seperated_command_string[i] = strip_whitespace(seperated_command_string[i]);
         token = strtok(NULL, FILE_SEPARATOR);
         chunks++;
     }
