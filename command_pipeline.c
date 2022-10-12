@@ -133,9 +133,8 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     strcpy(pipe_string, seperated_command_string[0]);
     token = strtok(pipe_string, PIPE_SEPARATOR);
-    char **pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
-    char **stripped_pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
-    command_pipeline_object->commands = (Command**) malloc(command_pipeline_object->commands_length * sizeof(Command*));
+    char *pipe_commands[command_pipeline_object->commands_length];
+    char *stripped_pipe_commands[command_pipeline_object->commands_length];
     for (unsigned i = 0; token != NULL; i++)
     {
         pipe_commands[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
@@ -158,8 +157,6 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     {
         free(pipe_commands[i]);
     }
-    free(pipe_commands);
-    free(stripped_pipe_commands);
 
     if (validate_command_pipeline(command_pipeline_object))
     {
