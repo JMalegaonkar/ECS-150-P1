@@ -76,6 +76,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     if (strlen(stripped_full_command_string) == 0)
     {
+        free(full_command_string);
         return NULL;
     }
 
