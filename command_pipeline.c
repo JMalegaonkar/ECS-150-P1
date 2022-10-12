@@ -111,9 +111,8 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         command_pipeline_object->output_file = (char*) malloc((strlen(seperated_command_string[1]) + 1) * sizeof(char));
         strcpy(command_pipeline_object->output_file, seperated_command_string[1]);
         command_pipeline_object->output_file = strip_whitespace(command_pipeline_object->output_file);
+        free(seperated_command_string[1]);
     }
-
-    free(seperated_command_string[1]);
 
     char* pipe_string = (char*) malloc((strlen(seperated_command_string[0]) + 1) * sizeof(char));
     char* pipe_string2 = (char*) malloc((strlen(seperated_command_string[0]) + 1) * sizeof(char));
