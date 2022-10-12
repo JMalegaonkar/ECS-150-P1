@@ -123,25 +123,24 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     free(seperated_command_string[0]);
     free(seperated_command_string);
 
-
     // Populate commands_length
     command_pipeline_object->commands_length = 0;
-    char *token1 = strtok(pipe_string, PIPE_SEPARATOR);
-    while (token1 != NULL)
+    token = strtok(pipe_string, PIPE_SEPARATOR);
+    while (token != NULL)
     {
         command_pipeline_object->commands_length++;
-        token1 = strtok(NULL, PIPE_SEPARATOR);
+        token = strtok(NULL, PIPE_SEPARATOR);
     }
 
-    char *token2 = strtok(pipe_string2, PIPE_SEPARATOR);
+    token = strtok(pipe_string2, PIPE_SEPARATOR);
     char **pipe_commands = (char**) malloc(command_pipeline_object->commands_length * sizeof(char*));
-    for (unsigned i = 0; token2 != NULL; i++)
+    for (unsigned i = 0; token != NULL; i++)
     {
-        char * tmp_string2 = token2;
+        char * tmp_string2 = token;
         tmp_string2 = strip_whitespace(tmp_string2);
         pipe_commands[i] = (char*) malloc((strlen(tmp_string2) + 1) * sizeof(char));
         strcpy(pipe_commands[i],tmp_string2);
-        token2 = strtok(NULL, PIPE_SEPARATOR);
+        token = strtok(NULL, PIPE_SEPARATOR);
     }
 
     free(pipe_string2);
