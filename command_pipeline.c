@@ -109,29 +109,33 @@ CommandPipeline* create_command_pipeline(const char* command_string)
 
     char *token = strtok(stripped_full_command_string, FILE_SEPARATOR);
     char *seperated_command_string[2];
+    char *stripped_seperated_command_string[2];
     int chunks = 0;
     for (unsigned i = 0; token != NULL; i++)
     {
         seperated_command_string[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
         strcpy(seperated_command_string[i], token);
-        seperated_command_string[i] = strip_whitespace(seperated_command_string[i]);
+        stripped_seperated_command_string[i] = strip_whitespace(seperated_command_string[i]);
         token = strtok(NULL, FILE_SEPARATOR);
         chunks++;
     }
 
     free(full_command_string);
 
+    char* main_command_string = stripped_seperated_command_string[0];
+    char* output_file = stripped_seperated_command_string[1];
+
     command_pipeline_object->output_file = NULL;
     if (chunks == 2)
     {
-        command_pipeline_object->output_file = (char*) malloc((strlen(seperated_command_string[1]) + 1) * sizeof(char));
-        strcpy(command_pipeline_object->output_file, seperated_command_string[1]);
+        command_pipeline_object->output_file = (char*) malloc((strlen(output_file) + 1) * sizeof(char));
+        strcpy(command_pipeline_object->output_file, output_file);
         command_pipeline_object->output_file = strip_whitespace(command_pipeline_object->output_file);
         free(seperated_command_string[1]);
     }
 
-    char* pipe_string = (char*) malloc((strlen(seperated_command_string[0]) + 1) * sizeof(char));
-    strcpy(pipe_string, seperated_command_string[0]);
+    char* pipe_string = (char*) malloc((strlen(main_command_string) + 1) * sizeof(char));
+    strcpy(pipe_string, main_command_string);
 
     // Populate commands_length
     command_pipeline_object->commands_length = 0;
@@ -142,7 +146,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         token = strtok(NULL, PIPE_SEPARATOR);
     }
 
-    strcpy(pipe_string, seperated_command_string[0]);
+    strcpy(pipe_string, main_command_string);
     token = strtok(pipe_string, PIPE_SEPARATOR);
     char *pipe_commands[command_pipeline_object->commands_length];
     char *stripped_pipe_commands[command_pipeline_object->commands_length];
