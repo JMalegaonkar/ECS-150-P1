@@ -138,8 +138,8 @@ void parse_pipelined_commands(
     // Populate command strings
     strcpy(pipe_string, main_command_string);
     token = strtok(pipe_string, seperator);
-    char *pipe_commands[command_pipeline_object->commands_length];
-    char *stripped_pipe_commands[command_pipeline_object->commands_length];
+    char* pipe_commands[command_pipeline_object->commands_length];
+    char* stripped_pipe_commands[command_pipeline_object->commands_length];
     for (unsigned i = 0; token != NULL; i++)
     {
         pipe_commands[i] = (char*) malloc((strlen(token) + 1) * sizeof(char));
@@ -176,9 +176,9 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     }
 
     // Parse output redirection
-    char *token = strtok(stripped_full_command_string, FILE_SEPARATOR);
-    char *seperated_command_string[2] = { NULL, NULL };
-    char *stripped_seperated_command_string[2] = { NULL, NULL };
+    char* token = strtok(stripped_full_command_string, FILE_SEPARATOR);
+    char* seperated_command_string[2] = { NULL, NULL };
+    char* stripped_seperated_command_string[2] = { NULL, NULL };
     parse_output_redirection(token, seperated_command_string, stripped_seperated_command_string, command_pipeline_object, FILE_SEPARATOR);
     free(full_command_string);
 
