@@ -32,7 +32,7 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
             if (number_directories > 1)
             {
                 fprintf(stderr, "Error: too many process arguments\n");
-                return 1;
+                return 0;
             }
         }
     }
@@ -46,7 +46,7 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
             if (output_file[i] == ' ')
             {
                 fprintf(stderr, "Error: mislocated output redirection\n");
-                return 1;
+                return 0;
             }
         }
 
@@ -56,11 +56,11 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
         if (fd == -1)
         {
             fprintf(stderr, "Error: cannot open output file\n");
-            return 1;
+            return 0;
         }
     }
 
-    return 0;
+    return 1;
 }
 
 int validate_raw_command_string(char* command_string)
@@ -195,7 +195,7 @@ CommandPipeline* create_command_pipeline(const char* command_string)
         PIPE_SEPARATOR);
     free(seperated_command_string[0]);
 
-    if (validate_command_pipeline(command_pipeline_object))
+    if (!validate_command_pipeline(command_pipeline_object))
     {
         return NULL;
     }
