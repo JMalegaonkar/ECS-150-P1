@@ -16,6 +16,7 @@
 
 void execute_command(Command *command, int is_first_command)
 {
+        // Handle input redirection (only possible for first command in pipeline)
         if (is_first_command && command->expects_input_file)
         {
                 if (command->input_file == NULL)
@@ -34,8 +35,8 @@ void execute_command(Command *command, int is_first_command)
                 dup2(fd, STDIN_FILENO);
         }
 
+        // Populate argv to run execvp
         char *argv[command->args_len + 2];
-
         argv[0] = command->cmd;
         for (int i=0; i<command->args_len; i++)
         {
@@ -43,6 +44,7 @@ void execute_command(Command *command, int is_first_command)
         }
         argv[command->args_len + 1] = NULL;
 
+        // Run command using execvp
         execvp(command->cmd, argv);
         (errno == ENOENT)
                 ? fprintf(stderr, "Error: command not found\n")
