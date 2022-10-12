@@ -63,6 +63,33 @@ int validate_command_pipeline(const CommandPipeline* command_pipeline)
     return 0;
 }
 
+int validate_raw_command_string(char* command_string)
+{
+    if (strlen(command_string) == 0)
+    {
+        return 0;
+    }
+
+    int is_missing_command =
+        command_string[0] == '>' ||
+        command_string[0] == '|' ||
+        command_string[strlen(command_string)-1] == '|';
+    if (is_missing_command)
+    {
+        fprintf(stderr, "Error: missing command\n");
+        return 0;
+    }
+
+    int is_missing_output_file = command_string[strlen(command_string)-1] == '>';
+    if (is_missing_output_file)
+    {
+        fprintf(stderr, "Error: no output file\n");
+        return 0;
+    }
+
+    return 1;
+}
+
 CommandPipeline* create_command_pipeline(const char* command_string)
 {
     const char* FILE_SEPARATOR = ">";
@@ -74,26 +101,9 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     strcpy(full_command_string, command_string);
     char* stripped_full_command_string = strip_whitespace(full_command_string);
 
-    if (strlen(stripped_full_command_string) == 0)
+    if (!validate_raw_command_string(stripped_full_command_string))
     {
         free(full_command_string);
-        return NULL;
-    }
-
-    int is_missing_command =
-        stripped_full_command_string[0] == '>' ||
-        stripped_full_command_string[0] == '|' ||
-        stripped_full_command_string[strlen(stripped_full_command_string)-1] == '|';
-    if (is_missing_command)
-    {
-        fprintf(stderr, "Error: missing command\n");
-        return NULL;
-    }
-
-    int is_missing_output_file = stripped_full_command_string[strlen(stripped_full_command_string)-1] == '>';
-    if (is_missing_output_file)
-    {
-        fprintf(stderr, "Error: no output file\n");
         return NULL;
     }
 
