@@ -74,6 +74,11 @@ CommandPipeline* create_command_pipeline(const char* command_string)
     strcpy(full_command_string, command_string);
     full_command_string = strip_whitespace(full_command_string);
 
+    if (strlen(full_command_string) == 0)
+    {
+        return NULL;
+    }
+
     int is_missing_command =
         full_command_string[0] == '>' ||
         full_command_string[0] == '|' ||
