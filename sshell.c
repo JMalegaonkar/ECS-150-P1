@@ -14,6 +14,9 @@
 
 #define CMDLINE_MAX 512
 
+#define IS_FIRST_COMMAND 1
+#define IS_NOT_FIRST_COMMAND 0
+
 void execute_command(Command *command, int is_first_command)
 {
         // Handle input redirection (only possible for first command in pipeline)
@@ -57,8 +60,7 @@ void execute_single_command(Command* command, const char* command_input)
         // Fork child to execute command
         if (fork() == 0)
         {
-                int is_first_command = 1;
-                execute_command(command, is_first_command);
+                execute_command(command, IS_FIRST_COMMAND);
         }
 
         // Grab return value and print completion message
@@ -79,8 +81,7 @@ void execute_final_pipelined_command(CommandPipeline* command_pipeline, int* pid
         pids[command_pipeline_length - 1] = fork();
         if (pids[command_pipeline_length - 1] == 0)
         {
-                int is_first_command = 0;
-                execute_command(command_pipeline->commands[command_pipeline_length - 1], is_first_command);
+                execute_command(command_pipeline->commands[command_pipeline_length - 1], IS_NOT_FIRST_COMMAND);
         }
 
         // Construct chained status code from all return values
@@ -123,7 +124,7 @@ void execute_pipelined_command(CommandPipeline* command_pipeline, const char* co
                         close(fd[1]);
 
                         // Execute command
-                        int is_first_command = command_idx - 1 == 0;
+                        int is_first_command = (command_idx - 1 == 0);
                         execute_command(command_pipeline->commands[command_idx - 1], is_first_command);
                 }
                 else // parent
