@@ -66,6 +66,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, const char* com
                 WIFEXITED(retval)
                         ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval))
                         : fprintf(stderr, "Child did not terminate with exit\n");
+                exit(0);
         }
 
         int pids[command_pipeline->commands_length];
