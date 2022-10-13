@@ -22,14 +22,14 @@ void execute_command(Command *command, int is_first_command)
                 if (command->input_file == NULL)
                 {
                         fprintf(stderr, "Error: no input file\n");
-                        return;
+                        exit(132);
                 }
 
                 int fd = open(command->input_file, O_RDONLY, 0);
                 if (fd < 0)
                 {
                         fprintf(stderr, "Error: cannot open input file\n");
-                        return;
+                        exit(132);
                 }
 
                 dup2(fd, STDIN_FILENO);
@@ -52,6 +52,8 @@ void execute_command(Command *command, int is_first_command)
         exit(1);
 }
 
+
+
 void execute_pipeline_command(CommandPipeline* command_pipeline, const char* command_input)
 {
         if (command_pipeline->commands_length == 1)
@@ -60,11 +62,11 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, const char* com
                 if (pid == 0)
                 {
                         execute_command(command_pipeline->commands[0], 1);
-                        return;
                 }
+
                 int retval;
                 waitpid(pid, &retval, 0);
-                if (WIFEXITED(retval))
+                if (WIFEXITED(retval) && WEXITSTATUS(retval) != 132)
                 {
                         fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval));
                 }
@@ -256,31 +258,17 @@ int main(void)
 
                         // Execute command
                         execute_pipeline_command(command_pipeline, command_input);
-                        // if (command_pipeline->commands_length == 1)
-                        // {
-                        //         execute_command(command_pipeline->commands[0], 1);
-                        // }
-                        // else
-                        // {
-                        //         execute_pipeline_command(command_pipeline, command_input);
-                        // }
                 }
                 else // parent process
                 {
                         // Wait for child process to complete
                         wait(&retval);
 
+                        // Stop execution if child did not terminate normally
                         if (!WIFEXITED(retval))
                         {
-                                printf("exitted without code\n");
-                                exit(0);
+                                exit(1);
                         }
-
-                        // Execute command
-                        // WIFEXITED(retval)
-                        //         ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval))
-                        //         : fprintf(stderr, "Child did not terminate with exit\n");
-
                 }
 
         }
