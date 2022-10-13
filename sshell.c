@@ -52,6 +52,25 @@ void execute_command(Command *command, int is_first_command)
         exit(1);
 }
 
+void execute_single_command(Command* command, const char* command_input)
+{
+        // Fork child to execute command
+        if (fork() == 0)
+        {
+                int is_first_command = 1;
+                execute_command(command, is_first_command);
+        }
+
+        // Grab return value and print completion message
+        int retval;
+        wait(&retval);
+        if (WIFEXITED(retval) && WEXITSTATUS(retval) != 132)
+        {
+                fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval));
+        }
+        exit(0);
+}
+
 void execute_final_pipelined_command(CommandPipeline* command_pipeline, int* pids, const char* command_input)
 {
         int command_pipeline_length = command_pipeline->commands_length;
@@ -80,25 +99,6 @@ void execute_final_pipelined_command(CommandPipeline* command_pipeline, int* pid
         // Print completion message with chained status code
         fprintf(stderr, "+ completed '%s' %s\n", command_input, chained_status_codes);
         exit(1);
-}
-
-void execute_single_command(Command* command, const char* command_input)
-{
-        // Fork child to execute command
-        if (fork() == 0)
-        {
-                int is_first_command = 1;
-                execute_command(command, is_first_command);
-        }
-
-        // Grab return value and print completion message
-        int retval;
-        wait(&retval);
-        if (WIFEXITED(retval) && WEXITSTATUS(retval) != 132)
-        {
-                fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval));
-        }
-        exit(0);
 }
 
 void execute_pipelined_command(CommandPipeline* command_pipeline, const char* command_input)
