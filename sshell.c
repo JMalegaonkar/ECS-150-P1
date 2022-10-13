@@ -54,6 +54,7 @@ void execute_command(Command *command, int is_first_command)
 
 void execute_pipeline_command(CommandPipeline* command_pipeline)
 {
+        int pids[command_pipeline->commands_length];
         for (int i=1; i<command_pipeline->commands_length; i++)
         {
                 int fd[2];
@@ -76,16 +77,26 @@ void execute_pipeline_command(CommandPipeline* command_pipeline)
                         dup2(fd[0], STDIN_FILENO);
                         close(fd[0]);
 
+                        pids[i-1] = pid;
+
                         if (i == command_pipeline->commands_length-1)
                         {
-                                // execute_command(command_pipeline->commands[i], 0);
-                                int x = fork();
-                                if (x == 0) {
-                                        printf("my pid is %d\n", getpid());
-                                        execute_command(command_pipeline->commands[i], 0);}
-                                int lol;
-                                wait(&lol);
-                                printf("lol: %d\n", x);
+                                pid = fork();
+                                if (pid == 0)
+                                {
+                                        // child
+                                        execute_command(command_pipeline->commands[i], 0);
+                                }
+
+                                // parent
+                                pids[i] = pid;
+                                int retval;
+                                for (int i=0; i< command_pipeline->commands_length; i++)
+                                {
+                                        waitpid(pids[i], &retval, 0);
+                                        printf("The pid is %d and completed with code %d\n", pids[i], retval);
+                                }
+
                                 exit(0);
                         }
 
