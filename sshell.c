@@ -116,10 +116,10 @@ int main(void)
 
                         for (int i = 0; i < command_stack->top ; i ++)
                         {
-                                free(command_stack->stack[i]);
+                                free(command_stack->directory_stack[i]);
                         }
 
-                        free(command_stack->stack);
+                        free(command_stack->directory_stack);
                         free(command_stack);
 
                         fprintf(stderr, "Bye...\n");

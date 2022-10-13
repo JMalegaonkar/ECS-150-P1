@@ -11,75 +11,75 @@ CommandStack* create_stack(int size)
 
     ret_stack->max_size = size;
     ret_stack->top = -1;
-    ret_stack->stack = (char**) malloc(sizeof(char*) * size);
+    ret_stack->directory_stack = (char**) malloc(sizeof(char*) * size);
 
     return ret_stack;
 }
 
-int is_empty(CommandStack* s)
+int is_empty(CommandStack* command_stack)
 {
-    if (s == NULL)
+    if (command_stack == NULL)
     {
         fprintf(stderr, "Cannot work with NULL stack.\n");
     }
-    return s->top < 0;
+    return command_stack->top < 0;
 }
 
-void double_size(CommandStack* s)
+void double_size(CommandStack* command_stack)
 {
-    s->max_size = 2 * s->max_size;
-    char** doubled_stack = (char**) malloc(sizeof(char) * s->max_size);
-    for (int i = 0; i < s->top ; i ++)
+    command_stack->max_size = 2 * command_stack->max_size;
+    char** doubled_stack = (char**) malloc(sizeof(char) * command_stack->max_size);
+    for (int i = 0; i < command_stack->top ; i ++)
     {
-        doubled_stack[i] = (char*) malloc((strlen(s->stack[i]) + 1) * sizeof(char));
-        strcpy(doubled_stack[i],s->stack[i]);
-        free(s->stack[i]);
+        doubled_stack[i] = (char*) malloc((strlen(command_stack->directory_stack[i]) + 1) * sizeof(char));
+        strcpy(doubled_stack[i],command_stack->directory_stack[i]);
+        free(command_stack->directory_stack[i]);
     }
 
-    free(s->stack);
-    s->stack = doubled_stack;
+    free(command_stack->directory_stack);
+    command_stack->directory_stack = doubled_stack;
 }
 
-void push(CommandStack* s, char* directory)
+void push(CommandStack* command_stack, char* directory)
 {
-    if(s->top >= (s->max_size - 1)/2)
+    if(command_stack->top >= (command_stack->max_size - 1)/2)
     {
-        double_size(s);
+        double_size(command_stack);
     }
 
-    s->top++;
-    s->stack[s->top] = (char*) malloc((strlen(directory) + 1) * sizeof(char));
-    strcpy(s->stack[s->top], directory);
+    command_stack->top++;
+    command_stack->directory_stack[command_stack->top] = (char*) malloc((strlen(directory) + 1) * sizeof(char));
+    strcpy(command_stack->directory_stack[command_stack->top], directory);
 }
 
-void pop(CommandStack* s)
+void pop(CommandStack* command_stack)
 {
-    if (is_empty(s))
-    {
-        fprintf(stderr, "Error: directory stack empty\n");
-    }
-
-    if (s->top > -1)
-    {
-        free(s->stack[s->top]);
-    }
-
-    s->top--;
-}
-
-char* top(CommandStack* s)
-{
-    if (is_empty(s))
+    if (is_empty(command_stack))
     {
         fprintf(stderr, "Error: directory stack empty\n");
     }
 
-    return s->stack[s->top];
+    if (command_stack->top > -1)
+    {
+        free(command_stack->directory_stack[command_stack->top]);
+    }
+
+    command_stack->top--;
 }
 
-void get_commands(CommandStack* s, char* cwd)
+char* top(CommandStack* command_stack)
 {
-    if (is_empty(s))
+    if (is_empty(command_stack))
+    {
+        fprintf(stderr, "Error: directory stack empty\n");
+    }
+
+    return command_stack->directory_stack[command_stack->top];
+}
+
+void get_commands(CommandStack* command_stack, char* cwd)
+{
+    if (is_empty(command_stack))
     {
         fprintf(stderr, "%s\n", cwd);
     }
@@ -88,9 +88,9 @@ void get_commands(CommandStack* s, char* cwd)
         printf("%s\n", cwd);
     }
 
-    for (int i = s->top; i >= 0; i--)
+    for (int i = command_stack->top; i >= 0; i--)
     {
-        printf("%s\n", s->stack[i]);
+        printf("%s\n", command_stack->directory_stack[i]);
     }
 }
 
