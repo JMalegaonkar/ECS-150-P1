@@ -7,7 +7,7 @@ TARGET = sshell
 all: $(TARGET)
 
 $(TARGET): $(OBJFILES)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES) -lm
 
 clean:
 	rm -f $(OBJFILES) $(TARGET) *~
