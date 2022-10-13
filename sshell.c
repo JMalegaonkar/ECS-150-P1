@@ -78,8 +78,17 @@ void execute_pipeline_command(CommandPipeline* command_pipeline)
 
                         if (i == command_pipeline->commands_length-1)
                         {
-                                execute_command(command_pipeline->commands[i], 0);
+                                // execute_command(command_pipeline->commands[i], 0);
+                                int x = fork();
+                                if (x == 0) {
+                                        printf("my pid is %d\n", getpid());
+                                        execute_command(command_pipeline->commands[i], 0);}
+                                int lol;
+                                wait(&lol);
+                                printf("lol: %d\n", x);
+                                exit(0);
                         }
+
 
                 }
         }
