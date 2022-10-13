@@ -59,7 +59,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, const char* com
                 int pid = fork();
                 if (pid == 0)
                 {
-                        execute_command(command_pipeline->commands[0], 0);
+                        execute_command(command_pipeline->commands[0], 1);
                 }
                 int retval;
                 waitpid(pid, &retval, 0);
@@ -170,7 +170,7 @@ int main(void)
 
                         fprintf(stderr, "Bye...\n");
                         fprintf(stderr, "+ completed '%s' [0]\n", command_input);
-                        break;
+                        exit(0);
                 }
 
                 // Handle "pwd" command
