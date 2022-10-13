@@ -52,27 +52,36 @@ void execute_command(Command *command, int is_first_command)
         exit(1);
 }
 
-void execute_pipeline_command(CommandPipeline* command_pipeline, int command_idx)
+void execute_pipeline_command(CommandPipeline* command_pipeline)
 {
-        int fd[2];
-        pipe(fd);
-        if (fork() != 0)
+        for (int i=1; i<command_pipeline->commands_length; i++)
         {
-                close(fd[0]);
-                dup2(fd[1], STDOUT_FILENO);
-                close(fd[1]);
+                int fd[2];
+                pipe(fd);
+                int pid = fork();
+                if (pid == 0)
+                {
+                        // child
+                        close(fd[0]);
+                        dup2(fd[1], STDOUT_FILENO);
+                        close(fd[1]);
 
-                (command_idx - 1 == 0)
-                        ? execute_command(command_pipeline->commands[command_idx-1], command_idx)
-                        : execute_pipeline_command(command_pipeline, command_idx-1 == 0);
-        }
-        else
-        {
-                close(fd[1]);
-                dup2(fd[0], STDIN_FILENO);
-                close(fd[0]);
+                        int is_first_command = i-1 == 0;
+                        execute_command(command_pipeline->commands[i-1], is_first_command);
+                }
+                else
+                {
+                        // parent
+                        close(fd[1]);
+                        dup2(fd[0], STDIN_FILENO);
+                        close(fd[0]);
 
-                execute_command(command_pipeline->commands[command_idx], command_idx == 0);
+                        if (i == command_pipeline->commands_length-1)
+                        {
+                                execute_command(command_pipeline->commands[i], 0);
+                        }
+
+                }
         }
 }
 
@@ -208,7 +217,7 @@ int main(void)
                         // Execute command
                         (command_pipeline->commands_length == 1)
                                 ? execute_command(command_pipeline->commands[0], 1)
-                                : execute_pipeline_command(command_pipeline, command_pipeline->commands_length-1);
+                                : execute_pipeline_command(command_pipeline);
                 }
                 else // parent process
                 {

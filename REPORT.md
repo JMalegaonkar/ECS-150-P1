@@ -37,15 +37,15 @@ typedef struct Command
 
 ```
 
-To populate the attributes of the `Command` struct we create a method called `create_command(input_string)` 
+To populate the attributes of the `Command` struct we create a method called `create_command()`, which takes in the input passed into the sshell. First we create two copies of the input string. We use the strtok() function and the first string copy to parse through the string, separating by whitespace, and find the number of arguments and popluate the `arg_len` attribute. Next, we populate `cmd` atrrubute using the same `strtok` parser, but with the second copy of the string. After the first iteration of `strtok()`, we allocate memory for the `args` attribute using malloc and the arg_len found previously; then continue the `strtok()` iteration to populate the `*args` attribute. Finally we free the necessary memory and return a populated `Command` object.
 
-1. Use the `strtok(input_string_copy, " ")` function to parse through the string and find the number of arguments and 
+1. Use the `strtok(input_string_copy, " ")` function to parse through the string and find the number of arguments and
    popluate the `arg_len` attribute.
-2. Populate `cmd` atrrubute using a similar `strtok` parser as `(1)` 
-3. After the first iteration of `strtok()` in `(2)`, allocate memory for the `args` attribute using malloc and the arg_len 
+2. Populate `cmd` atrrubute using a similar `strtok` parser as `(1)`
+3. After the first iteration of `strtok()` in `(2)`, allocate memory for the `args` attribute using malloc and the arg_len
    found previously;
-4. Continue the `strtok()` iteration to populate the `*args` attribute. 
-5. Free the necessary memory and return the populated `Command` object.  
+4. Continue the `strtok()` iteration to populate the `*args` attribute.
+5. Free the necessary memory and return the populated `Command` object.
 
 ## `Special Cases`
 
@@ -53,16 +53,17 @@ To populate the attributes of the `Command` struct we create a method called `cr
 
 `cd`:
 
-1. Check if the `arg_len` is 1 and the command passed into the input is `cd` and store this value in an `int` 
-   variable `is_command_cd`. 
+1. Check if the `arg_len` is 1 and the command passed into the input is `cd` and store this value in an `int`
+   variable `is_command_cd`.
 2. If `is_command_cd` is equal to 1, check if the directory exists and change the directory using `chdir` else throw an
-   error 
+   error
 
 `pwd`:
 1. Check if the input passed in is `pwd` using `strcmp()`. If true, use `getcwd()` to get the `cwd` and print it
 
 ## Implement Piping and Handle Output Redirection
-For piping, we created another struct name `CommandPipeline` 
+
+For piping, we created another struct name `CommandPipeline`
 
 ```c
 typedef struct CommandPipeline
@@ -76,7 +77,7 @@ To create a `CommandPipeline` object, the `create_command_pipeline()` method is 
 
 ## Standard input redirection
 
-To handle standard input redirection, we added a `strtok()` parser using `<` as the separator to the `create_command` method of the `Command` struct and modified the `Command` struct to include two more attributes: a flag that checks if we are expecting an input file and the input file itself. 
+To handle standard input redirection, we added a `strtok()` parser using `<` as the separator to the `create_command` method of the `Command` struct and modified the `Command` struct to include two more attributes: a flag that checks if we are expecting an input file and the input file itself.
 
 The parser works by first populate `expects_input_file` with the output of `strchr(input_string, '<')`. Next create another copy of the `input_string` and parse through it using `strtok()`
 
@@ -93,7 +94,7 @@ typedef struct Command
 
 ## Directory stack
 
-To implement `popd`, `pushd`, and `dirs` we desgined a simple stack struct, named `CommandStack` with all the basic methods modified to hold string objects. 
+To implement `popd`, `pushd`, and `dirs` we desgined a simple stack struct, named `CommandStack` with all the basic methods modified to hold string objects.
 
 ```c
 typedef struct CommandStack
@@ -103,17 +104,17 @@ typedef struct CommandStack
    int top;
 } CommandStack;
 ```
-1. `dirs` 
-    a. If stack object does not exist print `cwd`. 
+1. `dirs`
+    a. If stack object does not exist print `cwd`.
     b. If a stack exists the `cwd` is printed and then the stack is printed using a simple for loop ranging from the top value to 0.
 
-2. '`pushd` 
-    a. Check if the directory exists else we throw an error 
+2. '`pushd`
+    a. Check if the directory exists else we throw an error
     b. If directory exists the `push()` method is called -> the top attribute is increment and memory is allocated on the top of the stack for the string `cwd`. (If the stack is at half-capacity, the double_size method will be called and the stack will be readjusted)
 
-3. `popd` 
-    a. Change the directory to the top of the stack if top > -1 else throw an error 
-    b. If the directory change is sucessful, the `pop()` method is called -> which frees memory for the top command of the stack and then subtract the value of top if top > -1. 
+3. `popd`
+    a. Change the directory to the top of the stack if top > -1 else throw an error
+    b. If the directory change is sucessful, the `pop()` method is called -> which frees memory for the top command of the stack and then subtract the value of top if top > -1.
 
 
 ## License
