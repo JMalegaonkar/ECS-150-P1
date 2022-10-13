@@ -52,8 +52,22 @@ void execute_command(Command *command, int is_first_command)
         exit(1);
 }
 
-void execute_pipeline_command(CommandPipeline* command_pipeline)
+void execute_pipeline_command(CommandPipeline* command_pipeline, const char* command_input)
 {
+        if (command_pipeline->commands_length == 1)
+        {
+                int pid = fork();
+                if (pid == 0)
+                {
+                        execute_command(command_pipeline->commands[0], 0);
+                }
+                int retval;
+                waitpid(pid, &retval, 0);
+                WIFEXITED(retval)
+                        ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval))
+                        : fprintf(stderr, "Child did not terminate with exit\n");
+        }
+
         int pids[command_pipeline->commands_length];
         for (int i=1; i<command_pipeline->commands_length; i++)
         {
@@ -90,7 +104,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline)
 
                                 // parent
                                 pids[i] = pid;
-                                char* chained_status_codes = (char*) malloc(command_pipeline->commands_length * 3 * sizeof(char) + 1);
+                                char chained_status_codes[command_pipeline->commands_length * 3 + 1];
                                 for (int i=0; i< command_pipeline->commands_length; i++)
                                 {
                                         int retval;
@@ -101,7 +115,7 @@ void execute_pipeline_command(CommandPipeline* command_pipeline)
                                         chained_status_codes[3*i + 2] = ']';
                                 }
                                 chained_status_codes[command_pipeline->commands_length * 3] = '\0';
-                                printf("%s\n", chained_status_codes);
+                                fprintf(stderr, "+ completed '%s' %s\n", command_input, chained_status_codes);
                                 exit(1);
                         }
                 }
@@ -238,14 +252,15 @@ int main(void)
                         }
 
                         // Execute command
-                        if (command_pipeline->commands_length == 1)
-                        {
-                                execute_command(command_pipeline->commands[0], 1);
-                        }
-                        else
-                        {
-                                execute_pipeline_command(command_pipeline);
-                        }
+                        execute_pipeline_command(command_pipeline, command_input);
+                        // if (command_pipeline->commands_length == 1)
+                        // {
+                        //         execute_command(command_pipeline->commands[0], 1);
+                        // }
+                        // else
+                        // {
+                        //         execute_pipeline_command(command_pipeline, command_input);
+                        // }
                 }
                 else // parent process
                 {
@@ -253,9 +268,9 @@ int main(void)
                         wait(&retval);
 
                         // Execute command
-                        WIFEXITED(retval)
-                                ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval))
-                                : fprintf(stderr, "Child did not terminate with exit\n");
+                        // WIFEXITED(retval)
+                        //         ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval))
+                        //         : fprintf(stderr, "Child did not terminate with exit\n");
 
                 }
 
