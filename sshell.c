@@ -90,17 +90,20 @@ void execute_pipeline_command(CommandPipeline* command_pipeline)
 
                                 // parent
                                 pids[i] = pid;
-                                int retval;
+                                char* chained_status_codes = (char*) malloc(command_pipeline->commands_length * 3 * sizeof(char) + 1);
                                 for (int i=0; i< command_pipeline->commands_length; i++)
                                 {
+                                        int retval;
                                         waitpid(pids[i], &retval, 0);
-                                        printf("The pid is %d and completed with code %d\n", pids[i], retval);
+
+                                        chained_status_codes[3*i] = '[';
+                                        chained_status_codes[3*i + 1] = '0' + WEXITSTATUS(retval);
+                                        chained_status_codes[3*i + 2] = ']';
                                 }
-
-                                exit(0);
+                                chained_status_codes[command_pipeline->commands_length * 3] = '\0';
+                                printf("%s\n", chained_status_codes);
+                                exit(1);
                         }
-
-
                 }
         }
 }
@@ -235,9 +238,14 @@ int main(void)
                         }
 
                         // Execute command
-                        (command_pipeline->commands_length == 1)
-                                ? execute_command(command_pipeline->commands[0], 1)
-                                : execute_pipeline_command(command_pipeline);
+                        if (command_pipeline->commands_length == 1)
+                        {
+                                execute_command(command_pipeline->commands[0], 1);
+                        }
+                        else
+                        {
+                                execute_pipeline_command(command_pipeline);
+                        }
                 }
                 else // parent process
                 {
@@ -246,7 +254,7 @@ int main(void)
 
                         // Execute command
                         WIFEXITED(retval)
-                                ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, retval)
+                                ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval))
                                 : fprintf(stderr, "Child did not terminate with exit\n");
 
                 }
