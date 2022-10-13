@@ -60,12 +60,14 @@ void execute_pipeline_command(CommandPipeline* command_pipeline, const char* com
                 if (pid == 0)
                 {
                         execute_command(command_pipeline->commands[0], 1);
+                        return;
                 }
                 int retval;
                 waitpid(pid, &retval, 0);
-                WIFEXITED(retval)
-                        ? fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval))
-                        : fprintf(stderr, "Child did not terminate with exit\n");
+                if (WIFEXITED(retval))
+                {
+                        fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval));
+                }
                 exit(0);
         }
 
@@ -267,6 +269,12 @@ int main(void)
                 {
                         // Wait for child process to complete
                         wait(&retval);
+
+                        if (!WIFEXITED(retval))
+                        {
+                                printf("exitted without code\n");
+                                exit(0);
+                        }
 
                         // Execute command
                         // WIFEXITED(retval)
