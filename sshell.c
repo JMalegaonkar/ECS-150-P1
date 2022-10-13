@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <math.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -85,17 +86,25 @@ void execute_final_pipelined_command(CommandPipeline* command_pipeline, int* pid
         }
 
         // Construct chained status code from all return values
-        char chained_status_codes[command_pipeline_length * 3 + 1];
+        char chained_status_codes[command_pipeline_length * 5 + 1]; // 5 characters is largest status code (i.e. '[255]')
+        int chained_status_codes_idx = 0;
         for (int i=0; i<command_pipeline_length; i++)
         {
+                // Grab status code from child process using pid
                 int retval;
                 waitpid(pids[i], &retval, 0);
+                int status_code = WEXITSTATUS(retval);
 
-                chained_status_codes[3*i] = '[';
-                chained_status_codes[3*i + 1] = '0' + WEXITSTATUS(retval);
-                chained_status_codes[3*i + 2] = ']';
+                // Populate chain status code string with child process' status code
+                chained_status_codes[chained_status_codes_idx++] = '[';
+
+                sprintf(chained_status_codes + chained_status_codes_idx, "%d", status_code);
+                int status_code_size = (status_code <= 1) ? 1 : (int)((ceil(log10(status_code)))*sizeof(char));
+                chained_status_codes_idx += status_code_size;
+
+                chained_status_codes[chained_status_codes_idx++] = ']';
         }
-        chained_status_codes[command_pipeline_length * 3] = '\0';
+        chained_status_codes[chained_status_codes_idx] = '\0';
 
         // Print completion message with chained status code
         fprintf(stderr, "+ completed '%s' %s\n", command_input, chained_status_codes);
