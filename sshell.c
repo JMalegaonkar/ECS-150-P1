@@ -52,76 +52,94 @@ void execute_command(Command *command, int is_first_command)
         exit(1);
 }
 
-
-
-void execute_pipeline_command(CommandPipeline* command_pipeline, const char* command_input)
+void execute_final_pipelined_command(CommandPipeline* command_pipeline, int* pids, const char* command_input)
 {
-        if (command_pipeline->commands_length == 1)
-        {
-                int pid = fork();
-                if (pid == 0)
-                {
-                        execute_command(command_pipeline->commands[0], 1);
-                }
+        int command_pipeline_length = command_pipeline->commands_length;
 
-                int retval;
-                waitpid(pid, &retval, 0);
-                if (WIFEXITED(retval) && WEXITSTATUS(retval) != 132)
-                {
-                        fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval));
-                }
-                exit(0);
+        // Fork child to execute final command
+        pids[command_pipeline_length - 1] = fork();
+        if (pids[command_pipeline_length - 1] == 0)
+        {
+                int is_first_command = 0;
+                execute_command(command_pipeline->commands[command_pipeline_length - 1], is_first_command);
         }
 
-        int pids[command_pipeline->commands_length];
-        for (int i=1; i<command_pipeline->commands_length; i++)
+        // Construct chained status code from all return values
+        char chained_status_codes[command_pipeline_length * 3 + 1];
+        for (int i=0; i<command_pipeline_length; i++)
         {
+                int retval;
+                waitpid(pids[i], &retval, 0);
+
+                chained_status_codes[3*i] = '[';
+                chained_status_codes[3*i + 1] = '0' + WEXITSTATUS(retval);
+                chained_status_codes[3*i + 2] = ']';
+        }
+        chained_status_codes[command_pipeline_length * 3] = '\0';
+
+        // Print completion message with chained status code
+        fprintf(stderr, "+ completed '%s' %s\n", command_input, chained_status_codes);
+        exit(1);
+}
+
+void execute_single_command(Command* command, const char* command_input)
+{
+        // Fork child to execute command
+        if (fork() == 0)
+        {
+                int is_first_command = 1;
+                execute_command(command, is_first_command);
+        }
+
+        // Grab return value and print completion message
+        int retval;
+        wait(&retval);
+        if (WIFEXITED(retval) && WEXITSTATUS(retval) != 132)
+        {
+                fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval));
+        }
+        exit(0);
+}
+
+void execute_pipelined_command(CommandPipeline* command_pipeline, const char* command_input)
+{
+        int command_pipeline_length = command_pipeline->commands_length;
+        int pids[command_pipeline_length];
+
+        // Execute all commands in different processes (using pipes to enable IPC)
+        for (int command_idx=1; command_idx<command_pipeline_length; command_idx++)
+        {
+                // Create pipe to enable IPC
                 int fd[2];
                 pipe(fd);
+
+                // Fork child to pipeline commands
                 int pid = fork();
-                if (pid == 0)
+                if (pid == 0) // child
                 {
-                        // child
+                        // Send output of command to pipe
                         close(fd[0]);
                         dup2(fd[1], STDOUT_FILENO);
                         close(fd[1]);
 
-                        int is_first_command = i-1 == 0;
-                        execute_command(command_pipeline->commands[i-1], is_first_command);
+                        // Execute command
+                        int is_first_command = command_idx - 1 == 0;
+                        execute_command(command_pipeline->commands[command_idx - 1], is_first_command);
                 }
-                else
+                else // parent
                 {
-                        // parent
+                        // Grab input for command from pipe
                         close(fd[1]);
                         dup2(fd[0], STDIN_FILENO);
                         close(fd[0]);
 
-                        pids[i-1] = pid;
+                        // Save pid of child process
+                        pids[command_idx - 1] = pid;
 
-                        if (i == command_pipeline->commands_length-1)
+                        // Handle final command pipeline
+                        if (command_idx == command_pipeline_length - 1)
                         {
-                                pid = fork();
-                                if (pid == 0)
-                                {
-                                        // child
-                                        execute_command(command_pipeline->commands[i], 0);
-                                }
-
-                                // parent
-                                pids[i] = pid;
-                                char chained_status_codes[command_pipeline->commands_length * 3 + 1];
-                                for (int i=0; i< command_pipeline->commands_length; i++)
-                                {
-                                        int retval;
-                                        waitpid(pids[i], &retval, 0);
-
-                                        chained_status_codes[3*i] = '[';
-                                        chained_status_codes[3*i + 1] = '0' + WEXITSTATUS(retval);
-                                        chained_status_codes[3*i + 2] = ']';
-                                }
-                                chained_status_codes[command_pipeline->commands_length * 3] = '\0';
-                                fprintf(stderr, "+ completed '%s' %s\n", command_input, chained_status_codes);
-                                exit(1);
+                                execute_final_pipelined_command(command_pipeline, pids, command_input);
                         }
                 }
         }
@@ -257,7 +275,9 @@ int main(void)
                         }
 
                         // Execute command
-                        execute_pipeline_command(command_pipeline, command_input);
+                        (command_pipeline->commands_length == 1)
+                                ? execute_single_command(command_pipeline->commands[0], command_input)
+                                : execute_pipelined_command(command_pipeline, command_input);
                 }
                 else // parent process
                 {
