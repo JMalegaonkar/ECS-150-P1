@@ -13,9 +13,9 @@
 #include "command_stack.h"
 
 #define CMDLINE_MAX 512
-
 #define IS_FIRST_COMMAND 1
 #define IS_NOT_FIRST_COMMAND 0
+#define INPUT_REDIRECTION_ERROR_CODE 132
 
 void execute_command(Command *command, int is_first_command)
 {
@@ -25,14 +25,14 @@ void execute_command(Command *command, int is_first_command)
                 if (command->input_file == NULL)
                 {
                         fprintf(stderr, "Error: no input file\n");
-                        exit(132);
+                        exit(INPUT_REDIRECTION_ERROR_CODE);
                 }
 
                 int fd = open(command->input_file, O_RDONLY, 0);
                 if (fd < 0)
                 {
                         fprintf(stderr, "Error: cannot open input file\n");
-                        exit(132);
+                        exit(INPUT_REDIRECTION_ERROR_CODE);
                 }
 
                 dup2(fd, STDIN_FILENO);
@@ -66,7 +66,7 @@ void execute_single_command(Command* command, const char* command_input)
         // Grab return value and print completion message
         int retval;
         wait(&retval);
-        if (WIFEXITED(retval) && WEXITSTATUS(retval) != 132)
+        if (WIFEXITED(retval) && WEXITSTATUS(retval) != INPUT_REDIRECTION_ERROR_CODE)
         {
                 fprintf(stderr, "+ completed '%s' [%d]\n", command_input, WEXITSTATUS(retval));
         }
