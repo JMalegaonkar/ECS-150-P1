@@ -59,7 +59,7 @@ The first task our program does is convert the user input into a `CommandPipelin
     - invalid output file
 
 
-## Handle Special Cases
+## Handling Special Cases
 
 Our code handles special cases before the `fork`, `wait`, `exec` segment: each special command is handled in a similar fashion
 
@@ -90,7 +90,7 @@ typedef struct CommandStack
 } CommandStack;
 ```
 
-## Handle Pipes and Commands
+## Handling Pipes and Commands
 
 Once the `CommandPipeline` object has been created, the code goes into the `fork`, `wait`, `exec` segment to execute the commands. The flow of this logic is as follow:
 1. `fork()` to execute command in child, while waiting for completition in parent
