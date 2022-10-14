@@ -17,7 +17,7 @@ The implementation of this program follows three distinct steps in a continuous 
 
 ## Define Command Object
 
-Each command is converted into a struct named `Command` that holds the main command given and its arguments/flags.
+Each input command is converted into a struct named `Command` that holds the main command given and its arguments/flags.
 
 ```c
 typedef struct Command
@@ -59,7 +59,7 @@ The first task our program does is convert the user input into a `CommandPipelin
     - invalid output file
 
 
-## Handle Special Cases
+## Handling Special Cases
 
 Our code handles special cases before the `fork`, `wait`, `exec` segment: each special command is handled in a similar fashion
 
@@ -77,7 +77,7 @@ if (!strcmp(command_input, "pwd"))
 }
 ```
 
-## Extra Features: Directory stack
+## Extra Features: Directory Stack
 
 To implement `popd`, `pushd`, and `dirs`, we desgined a simple stack struct - `CommandStack` - along with specific helper methods interact with it.
 
@@ -90,7 +90,7 @@ typedef struct CommandStack
 } CommandStack;
 ```
 
-## Handle Pipes and Commands
+## Handling Pipes and Commands
 
 Once the `CommandPipeline` object has been created, the code goes into the `fork`, `wait`, `exec` segment to execute the commands. The flow of this logic is as follow:
 1. `fork()` to execute command in child, while waiting for completition in parent
