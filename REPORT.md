@@ -78,6 +78,19 @@ if (!strcmp(command_pipeline->commands[0]->cmd, "dirs"))
 }
 ```
 
+## Special Case: Directory stack
+
+To implement `popd`, `pushd`, and `dirs`, we desgined a simple stack struct - `CommandStack` - along with specific helper methods interact with it.
+
+```c
+typedef struct CommandStack
+{
+   char** directory_stack;
+   int max_size;
+   int top;
+} CommandStack;
+```
+
 ## Handle Pipes and Commands
 
 Once the `CommandPipeline` object has been created, the code goes into the `fork`, `wait`, `exec` segment to execute the commands. The flow of this logic is as follow:
@@ -100,20 +113,6 @@ Once the `CommandPipeline` object has been created, the code goes into the `fork
 **`execute_command()`**
 1. Handle input redirection if necessary using `dup2`
 2. Populate argv and pass command to `execvp()` to be executed
-
-## Special Case: Directory stack
-
-To implement `popd`, `pushd`, and `dirs` we desgined a simple stack struct - `CommandStack` - along with specific helper methods interact with it.
-
-```c
-typedef struct CommandStack
-{
-   char** directory_stack;
-   int max_size;
-   int top;
-} CommandStack;
-```
-
 ### Memory management
 
 One location where objects are dynamically allocated is in `command_pipeline.c` where `CommandPipeline` and `Command` objects are created. These objects are created on the heap since there can be an arbitrary amount of them and the sizes of them vary based on the specific user input. You'll notice that intermediate `malloc()` calls in this file are `free()`'ed as they're only temporarily needed in the construction of the `CommandPipeline` object.
