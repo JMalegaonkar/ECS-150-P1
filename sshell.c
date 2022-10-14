@@ -42,7 +42,7 @@ void execute_command(Command *command, int is_first_command)
         // Populate argv to run execvp
         char *argv[command->args_len + 2];
         argv[0] = command->cmd;
-        for (int i=0; i<command->args_len; i++)
+        for (int i = 0; i < command->args_len; i++)
         {
                 argv[i+1] = command->args[i];
         }
@@ -88,7 +88,7 @@ void execute_final_pipelined_command(CommandPipeline* command_pipeline, int* pid
         // Construct chained status code from all return values
         char chained_status_codes[command_pipeline_length * 5 + 1]; // 5 characters is largest status code (i.e. '[255]')
         int chained_status_codes_idx = 0;
-        for (int i=0; i<command_pipeline_length; i++)
+        for (int i = 0; i < command_pipeline_length; i++)
         {
                 // Grab status code from child process using pid
                 int retval;
@@ -117,7 +117,7 @@ void execute_pipelined_command(CommandPipeline* command_pipeline, const char* co
         int pids[command_pipeline_length];
 
         // Execute all commands in different processes (using pipes to enable IPC)
-        for (int command_idx=1; command_idx<command_pipeline_length; command_idx++)
+        for (int command_idx = 1; command_idx < command_pipeline_length; command_idx++)
         {
                 // Create pipe to enable IPC
                 int fd[2];
@@ -193,7 +193,7 @@ int main(void)
                 if (!strcmp(command_input, "exit"))
                 {
 
-                        for (int i = 0; i < command_stack->top ; i ++)
+                        for (int i = 0; i < command_stack->top; i++)
                         {
                                 free(command_stack->directory_stack[i]);
                         }
