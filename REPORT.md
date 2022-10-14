@@ -2,12 +2,11 @@
 
 ## Summary
 
-The program `sshell` can accept basic user inputs under the form of command lines and execute them (Similarly to UNIX shells such as `bash` or `zsh`). This basic shell is also configured to support multiple command arguments, command pipelining, as well as input/output redirection.
+The program `sshell` can accept basic user inputs in the form of command line inputs and execute them (Similar to UNIX shells such as `bash` or `zsh`). This basic shell is also configured to support multiple command arguments, command pipelining, as well as input/output redirection.
 
 ## Implementation
 
-The implementation of this program followings three distinct steps in an continous loop until the `exit` command is recieved:
-
+The implementation of this program follows three distinct steps in a continuous loop until the `exit` command is received:
 1. Parse user input into a workable format (`command_pipeline` struct)
 2. Handle specific cases such as `exit`, `cd`, `pwd`, `dirs`, `pushd`, and `popd`
 3. Enter `fork`, `wait`, `exec` segment to handle general commands
