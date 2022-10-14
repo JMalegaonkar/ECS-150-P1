@@ -80,24 +80,30 @@ if (!strcmp(command_pipeline->commands[0]->cmd, "dirs"))
 
 ## Handle Pipes and Commands
 
-### TALK ABOUT THE RECURSION AND WHEN TO USE RECURSION AND WHEN NOT TO, LOGIC BEHIND IT ###
+Once the `CommandPipeline` object has been created, the code goes into the `fork`, `wait`, `exec` segment to execute the commands. The flow of this logic is as follow:
+1. `fork()` to execute command in child, while waiting for completition in parent
+2. In the child, check how many commands there are to execute (pipelined commands may have multiple individual chained commands)
+    - If only single command, call `execute_single_command()`
+    - If multiple commands, call `execute_pipelined_command`
 
-Once the `CommandPipeline` object has been created, the code goes into the `fork`, `wait`, `exec` segment to execute the commands:
+**`execute_single_command()`**
+1. `fork()` child process to execute command using `execute_command()`
+2. In parent process, print completion message upon completion of child process
 
-1. If the object's command_length is 1, we call the `execute_single_command()` function which
+**`execute_pipelined_command()`**
+1. `fork()` new processes for each command that needs to be run
+2. Utilize `pipe()` to configure IPC between these processes
+3. Execute all commands using `execute_command()`
+3. Await all processes to complete using `waitpid()`
+4. Print completion message with status codes for each individual command
 
-2.
-
-3.
-
-4.
-
-
-
+**`execute_command()`**
+1. Handle input redirection if necessary using `dup2`
+2. Populate argv and pass command to `execvp()` to be executed
 
 ## Special Case: Directory stack
 
-To implement `popd`, `pushd`, and `dirs` we desgined a simple stack struct - `CommandStack`- along with specific helper methods interact with it.
+To implement `popd`, `pushd`, and `dirs` we desgined a simple stack struct - `CommandStack` - along with specific helper methods interact with it.
 
 ```c
 typedef struct CommandStack
