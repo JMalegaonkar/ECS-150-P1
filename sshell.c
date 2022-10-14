@@ -108,7 +108,7 @@ void execute_final_pipelined_command(CommandPipeline* command_pipeline, int* pid
 
         // Print completion message with chained status code
         fprintf(stderr, "+ completed '%s' %s\n", command_input, chained_status_codes);
-        exit(1);
+        exit(0);
 }
 
 void execute_pipelined_command(CommandPipeline* command_pipeline, const char* command_input)
