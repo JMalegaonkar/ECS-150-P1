@@ -113,3 +113,11 @@ typedef struct CommandStack
    int top;
 } CommandStack;
 ```
+
+### Memory management
+
+One location where objects are dynamically allocated is in `command_pipeline.c` where `CommandPipeline` and `Command` objects are created. These objects are created on the heap since there can be an arbitrary amount of them and the sizes of them vary based on the specific user input. You'll notice that intermediate `malloc()` calls in this file are `free()`'ed as they're only temporarily needed in the construction of the `CommandPipeline` object.
+
+However, `CommandPipeline` and its data members are never `free()`ed. This is because upon the program's completion (i.e. `exit()` or `execvp()`, these objects will automatically be freed).
+
+Another location of dynamic memory allocation is in `command_stack.c` which is used for the directory stack to handle commands such as `dirs()`, `pushd()`, and `popd()`. This also is never freed, but isn't an issue for the same reason as `CommandPipeline` - it is automatically freed upon the program's completion.
