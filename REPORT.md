@@ -14,10 +14,11 @@ The implementation of this program follows three distinct steps in a continuous 
     a. Handle input (`<`) and output (`>`) redirection using `dup2`
 
     b. Handle pipelined command through multiple `fork`/`dup2` calls to allow Inter-Process Communication (IPC), using `exec` for individual commands
+## Converting User Input to Commands
 
-## Define Command Object
+To convert user input to commands, we encapsulate command data using a struct.
 
-Each input command is converted into a struct named `Command` that holds the main command given and its arguments/flags.
+Each command is converted into a struct named `Command` that holds the main command and its arguments/flags.
 
 ```c
 typedef struct Command
@@ -30,9 +31,9 @@ typedef struct Command
 } Command;
 ```
 
-The `Command` struct only has one method `create_command()` which parses through the input string to populate the `Command` object. Creating the `Command` struct allows us to format the commands so that it is simple for the `CommandPipeline` to store multiple commands
+The `Command` struct only has one method `create_command()` which parses through the input string to populate the `Command` object. Creating the `Command` struct allows us to format the commands so that it is simple for the `CommandPipeline` to store multiple commands.
 
-## Converting Input to Commands
+Since pipelining can result in several chained sub-commands, we create a new struct (`CommandPipeline`) to hold an array of these sub-commands.
 
 ```c
 typedef struct CommandPipeline
