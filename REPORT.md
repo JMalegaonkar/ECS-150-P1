@@ -69,12 +69,12 @@ Our code handles special cases before the `fork`, `wait`, `exec` segment: each s
 
 `Example:`
 ```c
-if (!strcmp(command_pipeline->commands[0]->cmd, "dirs"))
+if (!strcmp(command_input, "pwd"))
 {
-        get_commands(command_stack, getcwd(cwd, sizeof(cwd) * sizeof(char)));
-        fprintf(stderr, "+ completed '%s' [0]\n", command_input);
-
-        continue;
+    getcwd(cwd, sizeof(cwd) * sizeof(char));
+    fprintf(stdout, "%s\n", cwd);
+    fprintf(stderr, "+ completed '%s' [0]\n", command_input);
+    continue;
 }
 ```
 
