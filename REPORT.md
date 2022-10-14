@@ -6,7 +6,7 @@ The program `sshell` can accept basic user inputs under the form of command line
 
 ## Implementation
 
-The implementation of this program followings XXX distinct steps in an continous loop until the `exit` command is recieved:
+The implementation of this program followings three distinct steps in an continous loop until the `exit` command is recieved:
 
 1. Parse user input into a workable format (`command_pipeline` struct)
 2. Handle specific cases such as `exit`, `cd`, `pwd`, `dirs`, `pushd`, and `popd`
@@ -16,38 +16,84 @@ The implementation of this program followings XXX distinct steps in an continous
 
     b. Handle pipelined command through recusive `fork`/`dup2` calls to allow Inter-Process Communication (IPC) between multiple processes handling individual commands using `exec`
 
-
-
-## Phase 0 & 1
-
-We transformed the given skeleton code into `fork`+`exec`+`wait` method (expand more)
-
-
-## Handle Simple Commands
-
-To handle arguments we created a struct named `Command` that could hold the main command given and its arguments/flags.
+## Define Command Object
+Each command is converted into a struct named `Command` that holds the main command given and its arguments/flags. 
 
 ```c
 typedef struct Command
 {
     char* cmd;
+    char* input_file;
     char** args;
     int args_len;
+    int expects_input_file;
 } Command;
-
 ```
 
-To populate the attributes of the `Command` struct we create a method called `create_command(input_string)` 
+The `Command` struct only has one method `create_command()` which does two things:
+1. first parses through the input string and checks if input redirection exists and populates the `input_file` atrribute
+2. parses through the in the input string using `strtok` and populates the attributes of `Command`
 
-1. Use the `strtok(input_string_copy, " ")` function to parse through the string and find the number of arguments and 
-   popluate the `arg_len` attribute.
-2. Populate `cmd` atrrubute using a similar `strtok` parser as `(1)` 
-3. After the first iteration of `strtok()` in `(2)`, allocate memory for the `args` attribute using malloc and the arg_len 
-   found previously;
-4. Continue the `strtok()` iteration to populate the `*args` attribute. 
-5. Free the necessary memory and return the populated `Command` object.  
+## Converting Input to Commands
 
-## `Special Cases`
+```c
+typedef struct CommandPipeline
+{
+    Command** commands;
+    char* output_file;
+    int commands_length;
+} CommandPipeline;
+```
+
+The first task our program does is convert the user input into a `CommandPipeline` object using the `create_command_pipleine` method. This method has three main helper functions:
+    
+1. `parse_output_redirection()` parses through the input string using `strtok` and returns an array of size 2 with the command or pipeline and the output file
+
+2. `parse_pipelined_commands()` parses through array[0] and separates the pipeline,converts each command into a `Command` object and stores it in the `CommandPipeline` object 
+
+3. `validate_command_pipeline()`:
+
+
+Once the `command_pipeline object has been created`:
+
+
+## Handle Special Cases
+
+Our code handles special cases before the `fork`, `wait`, `exec` segment: each special command is handled in a similar fashion
+
+1. use `strcmp` to check if `command_pipeline->commands[0]->cmd` and `the special command` are the same
+2. implement what the should do inside the if statement 
+
+`Example:`
+```c
+if (!strcmp(command_pipeline->commands[0]->cmd, "pushd"))
+{
+        getcwd(cwd, sizeof(cwd) * sizeof(char));
+        int status_code = chdir(command_pipeline->commands[0]->args[0]);
+        (status_code == -1)
+                ? fprintf(stderr, "Error: no such directory\n")
+                : push(command_stack, cwd);
+
+        fprintf(stderr, "+ completed '%s' [%d]\n", command_input, status_code ? 1 : 0);
+        continue;
+}
+```
+
+
+## Handle Pipes and Commands
+
+### TALK ABOUT THE RECURSION AND WHEN TO USE RECURSION AND WHEN NOT TO, LOGIC BEHIND IT ###
+
+
+
+
+
+
+
+
+### DONT REALLY NEED THIS
+
+<!-- ## `Special Cases`
 
 `exit`:
 
@@ -59,22 +105,15 @@ To populate the attributes of the `Command` struct we create a method called `cr
    error 
 
 `pwd`:
-1. Check if the input passed in is `pwd` using `strcmp()`. If true, use `getcwd()` to get the `cwd` and print it
+1. Check if the input passed in is `pwd` using `strcmp()`. If true, use `getcwd()` to get the `cwd` and print it -->
 
 ## Implement Piping and Handle Output Redirection
 For piping, we created another struct name `CommandPipeline` 
 
-```c
-typedef struct CommandPipeline
-{
-    Command** commands;
-    char* output_file;
-    int commands_length;
-} CommandPipeline;
-```
+
 To create a `CommandPipeline` object, the `create_command_pipeline()` method is called. First we validate whether the passed in string is a real command. Next, we parse the string to check if an output redirection exists using `strtok(string, ">")`, and store the string in `*output_file`. As. parse the string for output redirection, we split the string into two segments: the command(s) and the ouput_file; if the output file DNE then segment[1] is `NULL`. Third we take the first segment and use it to parse the pipeline twice using `strtok(string, "|")`. The first parser is used to populate the `command_length` and second is used to create an `Command` object for each command and store it inside `**commands`. Finally ,return the `CommandPipeline` object.
 
-## Standard input redirection
+<!-- ## Standard input redirection
 
 To handle standard input redirection, modified the `Command` struct to include two more attributes: a flag that checks if we are expecting an input file and the input file itself. 
 
@@ -91,7 +130,7 @@ typedef struct Command
     int expects_input_file;
 } Command;
 ```
-
+ -->
 ## Directory stack
 
 To implement `popd`, `pushd`, and `dirs` we desgined a simple stack struct, named `CommandStack` with all the basic methods modified to hold string objects. 
@@ -104,7 +143,7 @@ typedef struct CommandStack
    int top;
 } CommandStack;
 ```
-1. `dirs` 
+<!-- 1. `dirs` 
     a. If stack object does not exist print `cwd`. 
     b. If a stack exists the `cwd` is printed and then the stack is printed using a simple for loop ranging from the top value to 0.
 
@@ -114,7 +153,7 @@ typedef struct CommandStack
 
 3. `popd` 
     a. Change the directory to the top of the stack if top > -1 else throw an error 
-    b. If the directory change is sucessful, the `pop()` method is called -> which frees memory for the top command of the stack and then subtract the value of top if top > -1. 
+    b. If the directory change is sucessful, the `pop()` method is called -> which frees memory for the top command of the stack and then subtract the value of top if top > -1.  -->
 
 
 ## License
